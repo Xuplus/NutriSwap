@@ -64,6 +64,19 @@ export const messages = {
     'category.otros': 'Otros',
     'notFound.title': 'Página no encontrada',
     'notFound.back': 'Volver al inicio',
+    'attribution.title': 'Datos y licencias',
+    'attribution.intro':
+      'NutriSwap se construye sobre bases de datos abiertas de composición de alimentos. Gracias a sus autores y comunidades.',
+    'attribution.bedca.desc':
+      'Los alimentos genéricos provienen de BEDCA, la Base de Datos Española de Composición de Alimentos (AESAN y red de centros de investigación). Datos de acceso público.',
+    'attribution.off.desc':
+      'Los productos de supermercado provienen de Open Food Facts, base de datos colaborativa y abierta, bajo licencia Open Database License (ODbL). Nuestro conjunto de datos derivado está disponible en el repositorio del proyecto bajo la misma licencia.',
+    'attribution.method':
+      'La metodología de cálculo (fórmulas, fuentes científicas y reglas de equivalencia) está documentada en el repositorio.',
+    'attribution.repo': 'Código fuente y datos derivados en GitHub',
+    'footer.attribution': 'Datos y licencias',
+
+    'results.toEquivalence': 'Buscar alimentos equivalentes →',
 
     'form.you': 'Sobre ti',
     'form.sex': 'Sexo',
@@ -201,6 +214,19 @@ export const messages = {
     'category.otros': 'Other',
     'notFound.title': 'Page not found',
     'notFound.back': 'Back to home',
+    'attribution.title': 'Data & licenses',
+    'attribution.intro':
+      'NutriSwap is built on open food composition databases. Thanks to their authors and communities.',
+    'attribution.bedca.desc':
+      'Generic foods come from BEDCA, the Spanish Food Composition Database (AESAN and a network of research centers). Publicly accessible data.',
+    'attribution.off.desc':
+      'Supermarket products come from Open Food Facts, the collaborative open database, under the Open Database License (ODbL). Our derived dataset is available in the project repository under the same license.',
+    'attribution.method':
+      'The calculation methodology (formulas, scientific sources and equivalence rules) is documented in the repository.',
+    'attribution.repo': 'Source code and derived data on GitHub',
+    'footer.attribution': 'Data & licenses',
+
+    'results.toEquivalence': 'Find equivalent foods →',
 
     'form.you': 'About you',
     'form.sex': 'Sex',

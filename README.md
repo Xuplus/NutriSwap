@@ -29,8 +29,26 @@ npm run build    # type-check + production build to dist/
 Stack: Vite + Preact + TypeScript. No backend — all data is pre-baked JSON generated
 by the build-time data pipeline (Phase 1, see PLAN.md).
 
+## Data pipeline
+
+```bash
+node scripts/fetch-bedca.mjs        # download BEDCA foods via its XML API → data/raw/
+node scripts/build-foods-core.mjs   # normalize → public/data/foods-core.json
+# download the OFF parquet export (~7 GB) to data/raw/off-food.parquet, then:
+node scripts/extract-off.mjs        # → public/data/products/*.json + search index
+```
+
+A monthly GitHub Action ([data-refresh.yml](.github/workflows/data-refresh.yml))
+re-runs the pipeline and opens a PR with the refreshed datasets.
+
 Deployment: pushing to `main` runs tests, builds and deploys to GitHub Pages via
 GitHub Actions ([.github/workflows/ci.yml](.github/workflows/ci.yml)).
+
+## Data sources & licenses
+
+- Generic foods: [BEDCA](https://www.bedca.net) (AESAN, Spain) — public access, credited.
+- Supermarket products: [Open Food Facts](https://world.openfoodfacts.org) — ODbL 1.0;
+  the derived dataset in `public/data/` is likewise available under ODbL.
 
 ## Disclaimer
 

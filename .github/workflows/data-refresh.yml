@@ -1,0 +1,47 @@
+name: Data refresh
+
+on:
+  schedule:
+    - cron: '0 4 1 * *' # monthly, 1st at 04:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - name: Refresh BEDCA core foods
+        run: |
+          node scripts/fetch-bedca.mjs
+          node scripts/build-foods-core.mjs
+      - name: Download Open Food Facts parquet export
+        run: |
+          mkdir -p data/raw
+          curl -L --retry 3 -sS -o data/raw/off-food.parquet \
+            "https://huggingface.co/datasets/openfoodfacts/product-database/resolve/main/food.parquet"
+      - name: Extract Spanish supermarket products
+        run: node scripts/extract-off.mjs
+      - name: Verify build still passes with the new data
+        run: |
+          npm test
+          npm run build
+      - name: Open pull request with refreshed data
+        uses: peter-evans/create-pull-request@v7
+        with:
+          branch: data-refresh
+          commit-message: 'Data refresh: BEDCA + Open Food Facts'
+          title: 'Monthly data refresh'
+          body: |
+            Automated refresh of `public/data/` from BEDCA and the Open Food Facts
+            bulk export. Review the diff for anomalies (large drops in food counts
+            usually mean an upstream problem) before merging.
+          add-paths: public/data/

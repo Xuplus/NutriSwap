@@ -88,8 +88,16 @@ describe('calculateMacros — full pipeline', () => {
   });
 
   it('gain surplus depends on experience', () => {
-    const beginner = calculateMacros(male30, { level: 'moderate' }, { goal: 'gain', experience: 'beginner' });
-    const experienced = calculateMacros(male30, { level: 'moderate' }, { goal: 'gain', experience: 'experienced' });
+    const beginner = calculateMacros(
+      male30,
+      { level: 'moderate' },
+      { goal: 'gain', experience: 'beginner' },
+    );
+    const experienced = calculateMacros(
+      male30,
+      { level: 'moderate' },
+      { goal: 'gain', experience: 'experienced' },
+    );
     expect(beginner.goalKcal - beginner.tdee).toBe(400);
     expect(experienced.goalKcal - experienced.tdee).toBe(250);
     expect(beginner.expectedWeeklyChangeKg).toBeGreaterThan(0);

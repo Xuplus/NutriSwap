@@ -48,11 +48,7 @@ export interface GoalInput {
   experience?: Experience;
 }
 
-export type WarningKey =
-  | 'warn.kcalFloor'
-  | 'warn.lowCarbs'
-  | 'warn.bmiRange'
-  | 'warn.ageRange';
+export type WarningKey = 'warn.kcalFloor' | 'warn.lowCarbs' | 'warn.bmiRange' | 'warn.ageRange';
 
 export interface MacroResult {
   bmr: number;
@@ -247,8 +243,7 @@ export function calculateMacros(p: Profile, activity: Activity, goal: GoalInput)
     activityFactor: t.activityFactor,
     exerciseKcalPerDay: Math.round(t.exerciseKcalPerDay),
     goalKcal: Math.round(kcal),
-    expectedWeeklyChangeKg:
-      Math.round(((kcal - t.tdee) * 7 * 1000) / KCAL_PER_KG_BODYFAT) / 1000,
+    expectedWeeklyChangeKg: Math.round(((kcal - t.tdee) * 7 * 1000) / KCAL_PER_KG_BODYFAT) / 1000,
     proteinG: Math.round(proteinG),
     fatG: Math.round(fatG),
     carbsG: Math.round(carbsG),

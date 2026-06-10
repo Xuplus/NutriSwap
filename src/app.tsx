@@ -4,6 +4,7 @@ import { parseHash, routeHref, type Route } from './router';
 import { Home } from './pages/Home';
 import { Macros } from './pages/Macros';
 import { Equivalence } from './pages/Equivalence';
+import { Attribution } from './pages/Attribution';
 import { NotFound } from './pages/NotFound';
 
 export function App() {
@@ -59,11 +60,19 @@ export function App() {
         {route === 'home' && <Home lang={lang} />}
         {route === 'macros' && <Macros lang={lang} />}
         {route === 'equivalence' && <Equivalence lang={lang} />}
+        {route === 'attribution' && <Attribution lang={lang} />}
         {route === 'not-found' && <NotFound lang={lang} />}
       </main>
 
       <footer class="footer">
         <p>{t(lang, 'app.disclaimer')}</p>
+        <p>
+          <a href={routeHref('attribution')}>{t(lang, 'footer.attribution')}</a>
+          {' · '}
+          <a href="https://github.com/Xuplus/NutriSwap" target="_blank" rel="noopener noreferrer">
+            GitHub
+          </a>
+        </p>
       </footer>
     </div>
   );

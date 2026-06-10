@@ -46,37 +46,31 @@ calculation engines trivially unit-testable.
 
 ## Phase 1 — Data pipeline (the foundation of the equivalence tool)
 
-- [ ] BEDCA fetcher: query the XML API (`procquery.php`, see `pybedca` for the query
-      format), pull all foods + macros, normalize to the canonical schema.
-- [ ] OFF importer: download the Parquet export from Hugging Face, filter to Spain +
-      major stores (Mercadona, Carrefour, Lidl, Dia, Eroski, Alcampo, Consum),
-      apply quality filters (complete macros, Atwater sanity check, name present).
-- [ ] Normalization rules: per-100g basis, EU fiber/carb convention, dedupe near-identical
-      products (same brand + name + macros).
-- [ ] Our own category taxonomy (meats, fish, dairy, legumes, grains, fruits, vegetables,
-      nuts/fats, processed…) mapped from BEDCA groups and OFF category tags.
-- [ ] Output: `foods-core.json` (BEDCA generics, ~small, always loaded) +
-      `foods-products-<category>.json` chunks (OFF, lazy-loaded) + a compact search index.
-- [ ] Attribution page (ODbL for OFF, credit BEDCA/AESAN) and publish our derived
-      dataset per ODbL share-alike.
+- [x] BEDCA fetcher: query the XML API (`procquery.php`), pull all foods + macros,
+      normalize to the canonical schema. → 808 generic foods with complete macros.
+- [x] OFF importer: Parquet export from Hugging Face via DuckDB, filtered to Spain +
+      major stores, with quality filters. → 21,815 products.
+- [x] Normalization rules: per-100g basis, kJ→kcal, dedupe by name+brand keeping the
+      most-scanned entry, Atwater sanity check.
+- [x] Category taxonomy (15 categories) mapped from BEDCA groups and OFF category tags.
+- [x] Output: `foods-core.json` + `products/<category>.json` chunks + compact search index.
+- [x] Attribution page (ODbL for OFF, credit BEDCA/AESAN); derived dataset published in repo.
 
 ## Phase 2 — Macro calculator
 
-- [ ] Engine (`src/lib/macros.ts`, pure functions): Mifflin-St Jeor + Katch-McArdle
+- [x] Engine (`src/lib/macros.ts`, pure functions): Mifflin-St Jeor + Katch-McArdle
       (when body fat % given); TDEE from steps + reported exercise sessions (hybrid
       model from the research doc) with the classic activity dropdown as fallback;
       goal calories with safety floors (≥1,200/1,500 kcal, deficit ≤25% TDEE);
       macro split = protein by g/kg per goal → fat 25–30% kcal (floor 0.5 g/kg) →
       carbs as remainder, with the activity cross-check.
-- [ ] Unit tests against the worked example in the research doc + edge cases
+- [x] Unit tests against the worked example in the research doc + edge cases
       (obese user → adjusted body weight for protein; tiny TDEE → floor warnings).
-- [ ] Form UI: units (kg/cm), age, sex, weight, height, optional body fat %, avg daily
-      steps, exercise sessions/week (type + duration), goal (lose / maintain-recomp /
-      lean gain) with an aggressiveness slider where applicable.
-- [ ] Results UI: kcal + macro grams, expected weekly weight change, the "why" behind
-      each number (transparency builds trust), copy/share, save profile to localStorage.
-- [ ] Disclaimer: educational tool, not medical advice; flag BMI/age ranges where the
-      formulas are unreliable.
+- [x] Form UI: age, sex, weight, height, optional body fat %, steps + exercise sessions
+      or classic level, goal with pace/experience options.
+- [x] Results UI: kcal + macro grams, expected weekly change, step-by-step "why",
+      profile saved to localStorage.
+- [x] Disclaimer + warnings for BMI/age ranges where formulas are unreliable.
 
 ## Phase 3 — Equivalence tool
 
@@ -97,22 +91,19 @@ Methodology (the "generalize a bit" the project needs):
 
 Tasks:
 
-- [ ] Engine (`src/lib/equivalence.ts`): profile vectors, similarity, gram solver,
-      delta computation. Unit tests with hand-checked pairs (chicken↔hake,
-      rice↔pasta, yogurt↔skyr…).
-- [ ] Search UI: fuzzy search over generics + branded products (lazy-load chunks),
-      filter by category/store.
-- [ ] Results UI: ranked equivalents with gram amounts for the user's portion, match
-      quality badge, deltas; link branded products to their generic equivalent.
+- [x] Engine (`src/lib/equivalence.ts`): profile vectors, similarity, gram solver,
+      delta computation, ratio cap. Unit tests with hand-checked pairs.
+- [x] Search UI: accent-insensitive search over generics + opt-in branded products
+      (lazy-loaded chunks).
+- [x] Results UI: ranked equivalents with gram amounts, match quality badge, deltas.
 
 ## Phase 4 — Polish & launch
 
-- [ ] Connect the two tools: from the macro results, jump into equivalence with "find
-      foods to hit your remaining protein".
-- [ ] Full ES translation (primary audience), EN secondary.
-- [ ] Mobile layout, accessibility pass (labels, contrast, keyboard), SEO/meta, favicon.
-- [ ] Data refresh workflow (monthly GitHub Action that re-runs the pipeline and opens a PR).
-- [ ] README with attribution, methodology summary, and disclaimer.
+- [x] Connect the two tools: link from macro results into the equivalence tool.
+- [x] Full ES translation (primary audience), EN secondary.
+- [x] Mobile layout, basic accessibility (labels, aria-live, keyboard), SEO/meta.
+- [x] Data refresh workflow (monthly GitHub Action that re-runs the pipeline and opens a PR).
+- [x] README with attribution, methodology summary, and disclaimer.
 
 ## Later ideas (out of scope for v1)
 

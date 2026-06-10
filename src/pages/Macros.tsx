@@ -423,6 +423,11 @@ export function Macros({ lang }: { lang: Lang }) {
                 </ul>
               </details>
               <p class="hint">{t(lang, 'results.fiber', { g: result.fiberG })}</p>
+              <p>
+                <a class="button" href="#/equivalence">
+                  {t(lang, 'results.toEquivalence')}
+                </a>
+              </p>
             </>
           ) : (
             <p class="placeholder">{t(lang, 'macros.intro')}</p>
