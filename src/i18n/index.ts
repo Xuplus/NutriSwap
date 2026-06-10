@@ -23,13 +23,92 @@ export const messages = {
       'Encuentra alimentos intercambiables por sus macronutrientes: cuántos gramos de merluza equivalen a tu pechuga de pollo.',
     'home.cta': 'Abrir herramienta',
     'macros.title': 'Calculadora de macros',
-    'macros.comingSoon':
-      'En construcción: aquí calcularás tus calorías y macros diarios según tu objetivo.',
+    'macros.intro':
+      'Calcula tus calorías y macronutrientes diarios. Los resultados se actualizan al momento y explican cada paso del cálculo.',
     'equivalence.title': 'Equivalencias de alimentos',
     'equivalence.comingSoon':
       'En construcción: aquí buscarás alimentos equivalentes en macronutrientes.',
     'notFound.title': 'Página no encontrada',
     'notFound.back': 'Volver al inicio',
+
+    'form.you': 'Sobre ti',
+    'form.sex': 'Sexo',
+    'form.sex.male': 'Hombre',
+    'form.sex.female': 'Mujer',
+    'form.age': 'Edad (años)',
+    'form.weight': 'Peso (kg)',
+    'form.height': 'Altura (cm)',
+    'form.bodyfat': '% de grasa corporal (opcional)',
+    'form.bodyfat.hint':
+      'Si lo conoces, usaremos la fórmula Katch-McArdle, más precisa para personas con bastante masa muscular.',
+    'form.activity': 'Tu actividad',
+    'form.activity.mode.steps': 'Conozco mis pasos diarios',
+    'form.activity.mode.level': 'Elegir nivel general',
+    'form.activity.steps': 'Pasos diarios (media)',
+    'form.activity.steps.hint':
+      'La media semanal de tu móvil o pulsera. Es más fiable que autoevaluarse.',
+    'form.activity.level': 'Nivel de actividad',
+    'activity.sedentary': 'Sedentario (trabajo de oficina, poco ejercicio)',
+    'activity.light': 'Ligero (ejercicio 1-3 días/semana)',
+    'activity.moderate': 'Moderado (ejercicio 3-5 días/semana)',
+    'activity.very': 'Muy activo (ejercicio 6-7 días/semana)',
+    'activity.extra': 'Extremo (trabajo físico + entreno diario)',
+    'form.exercise': 'Ejercicio semanal',
+    'form.exercise.hint': 'Añade tus entrenamientos para afinar el gasto calórico.',
+    'form.exercise.add': '+ Añadir ejercicio',
+    'form.exercise.remove': 'Quitar',
+    'form.exercise.minutes': 'min/semana',
+    'exercise.walking': 'Caminar',
+    'exercise.running': 'Correr',
+    'exercise.cycling': 'Bicicleta',
+    'exercise.swimming': 'Natación',
+    'exercise.strength': 'Pesas / fuerza',
+    'exercise.team-sports': 'Deportes de equipo',
+    'exercise.hiit': 'HIIT / crossfit',
+    'exercise.yoga': 'Yoga / pilates',
+    'form.goal': 'Tu objetivo',
+    'goal.lose': 'Perder grasa',
+    'goal.maintain': 'Mantener / recomposición',
+    'goal.gain': 'Ganar músculo',
+    'form.aggressiveness': 'Ritmo',
+    'aggressiveness.conservative': 'Suave (−300 kcal/día)',
+    'aggressiveness.standard': 'Estándar (−500 kcal/día)',
+    'aggressiveness.aggressive': 'Agresivo (−25% de tu gasto)',
+    'form.experience': 'Experiencia en el gimnasio',
+    'experience.beginner': 'Principiante (< 2 años)',
+    'experience.experienced': 'Experimentado',
+
+    'results.title': 'Tus macros diarios',
+    'results.kcal': 'Calorías',
+    'results.protein': 'Proteína',
+    'results.carbs': 'Carbohidratos',
+    'results.fat': 'Grasa',
+    'results.fiber': 'Fibra recomendada: {g} g/día',
+    'results.expected.lose': 'Ritmo esperado: {kg} kg/semana',
+    'results.expected.gain': 'Ritmo esperado: +{kg} kg/semana',
+    'results.expected.maintain': 'Mantendrás tu peso actual',
+    'results.how': 'Cómo lo calculamos',
+    'results.how.bmr': 'Metabolismo basal ({formula}): {kcal} kcal',
+    'results.formula.mifflin-st-jeor': 'Mifflin-St Jeor',
+    'results.formula.katch-mcardle': 'Katch-McArdle',
+    'results.how.tdee.level':
+      'Gasto diario total: {bmr} × {factor} (nivel de actividad) = {kcal} kcal',
+    'results.how.tdee.steps':
+      'Gasto diario total: {bmr} × {factor} (por tus pasos) + {exercise} kcal de ejercicio = {kcal} kcal',
+    'results.how.goal.lose': 'Déficit para perder grasa: {kcal} kcal/día',
+    'results.how.goal.gain': 'Superávit para ganar músculo: +{kcal} kcal/día',
+    'results.how.goal.maintain': 'Calorías de mantenimiento, sin ajuste',
+    'results.how.protein': 'Proteína: {perKg} g/kg → {g} g ({kcal} kcal)',
+    'results.how.fat': 'Grasa: 25% de las calorías (mínimo 0,6 g/kg) → {g} g ({kcal} kcal)',
+    'results.how.carbs': 'Carbohidratos: el resto de calorías → {g} g ({kcal} kcal)',
+    'warn.kcalFloor':
+      'El resultado quedaba por debajo del mínimo seguro y lo hemos ajustado. Consulta a un profesional antes de seguir una dieta tan restrictiva.',
+    'warn.lowCarbs':
+      'Con este déficit los carbohidratos quedan bajos para tu nivel de actividad. Considera un ritmo más suave.',
+    'warn.bmiRange':
+      'Con un IMC alto las fórmulas pierden precisión. Tómalo como orientación y valora consultar a un profesional.',
+    'warn.ageRange':
+      'A partir de 65 años las fórmulas estándar pierden precisión. Tómalo como orientación.',
   },
   en: {
     'app.tagline': 'Your macros, your swaps',
@@ -38,8 +117,7 @@ export const messages = {
     'nav.macros': 'Macro calculator',
     'nav.equivalence': 'Equivalences',
     'home.title': 'Welcome to NutriSwap',
-    'home.intro':
-      'Two tools to plan your nutrition using open food composition data from Spain.',
+    'home.intro': 'Two tools to plan your nutrition using open food composition data from Spain.',
     'home.macros.title': 'Macro calculator',
     'home.macros.desc':
       'From your personal data, activity and goal, calculate the calories, protein, carbs and fat you need every day.',
@@ -48,20 +126,104 @@ export const messages = {
       'Find foods that are interchangeable by macronutrients: how many grams of hake equal your chicken breast.',
     'home.cta': 'Open tool',
     'macros.title': 'Macro calculator',
-    'macros.comingSoon':
-      'Under construction: here you will calculate your daily calories and macros for your goal.',
+    'macros.intro':
+      'Calculate your daily calories and macronutrients. Results update live and explain every step of the math.',
     'equivalence.title': 'Food equivalences',
     'equivalence.comingSoon':
       'Under construction: here you will search for macro-equivalent foods.',
     'notFound.title': 'Page not found',
     'notFound.back': 'Back to home',
+
+    'form.you': 'About you',
+    'form.sex': 'Sex',
+    'form.sex.male': 'Male',
+    'form.sex.female': 'Female',
+    'form.age': 'Age (years)',
+    'form.weight': 'Weight (kg)',
+    'form.height': 'Height (cm)',
+    'form.bodyfat': 'Body fat % (optional)',
+    'form.bodyfat.hint':
+      'If you know it, we use the Katch-McArdle formula, more accurate for muscular people.',
+    'form.activity': 'Your activity',
+    'form.activity.mode.steps': 'I know my daily steps',
+    'form.activity.mode.level': 'Pick a general level',
+    'form.activity.steps': 'Daily steps (average)',
+    'form.activity.steps.hint':
+      "Your phone or tracker's weekly average. More reliable than self-assessing.",
+    'form.activity.level': 'Activity level',
+    'activity.sedentary': 'Sedentary (desk job, little exercise)',
+    'activity.light': 'Light (exercise 1-3 days/week)',
+    'activity.moderate': 'Moderate (exercise 3-5 days/week)',
+    'activity.very': 'Very active (exercise 6-7 days/week)',
+    'activity.extra': 'Extra active (physical job + daily training)',
+    'form.exercise': 'Weekly exercise',
+    'form.exercise.hint': 'Add your workouts to refine the energy estimate.',
+    'form.exercise.add': '+ Add exercise',
+    'form.exercise.remove': 'Remove',
+    'form.exercise.minutes': 'min/week',
+    'exercise.walking': 'Walking',
+    'exercise.running': 'Running',
+    'exercise.cycling': 'Cycling',
+    'exercise.swimming': 'Swimming',
+    'exercise.strength': 'Weights / strength',
+    'exercise.team-sports': 'Team sports',
+    'exercise.hiit': 'HIIT / crossfit',
+    'exercise.yoga': 'Yoga / pilates',
+    'form.goal': 'Your goal',
+    'goal.lose': 'Lose fat',
+    'goal.maintain': 'Maintain / recomposition',
+    'goal.gain': 'Gain muscle',
+    'form.aggressiveness': 'Pace',
+    'aggressiveness.conservative': 'Gentle (−300 kcal/day)',
+    'aggressiveness.standard': 'Standard (−500 kcal/day)',
+    'aggressiveness.aggressive': 'Aggressive (−25% of expenditure)',
+    'form.experience': 'Training experience',
+    'experience.beginner': 'Beginner (< 2 years)',
+    'experience.experienced': 'Experienced',
+
+    'results.title': 'Your daily macros',
+    'results.kcal': 'Calories',
+    'results.protein': 'Protein',
+    'results.carbs': 'Carbs',
+    'results.fat': 'Fat',
+    'results.fiber': 'Recommended fiber: {g} g/day',
+    'results.expected.lose': 'Expected pace: {kg} kg/week',
+    'results.expected.gain': 'Expected pace: +{kg} kg/week',
+    'results.expected.maintain': 'You will maintain your current weight',
+    'results.how': 'How we calculate it',
+    'results.how.bmr': 'Basal metabolic rate ({formula}): {kcal} kcal',
+    'results.formula.mifflin-st-jeor': 'Mifflin-St Jeor',
+    'results.formula.katch-mcardle': 'Katch-McArdle',
+    'results.how.tdee.level':
+      'Total daily expenditure: {bmr} × {factor} (activity level) = {kcal} kcal',
+    'results.how.tdee.steps':
+      'Total daily expenditure: {bmr} × {factor} (from your steps) + {exercise} kcal of exercise = {kcal} kcal',
+    'results.how.goal.lose': 'Deficit for fat loss: {kcal} kcal/day',
+    'results.how.goal.gain': 'Surplus for muscle gain: +{kcal} kcal/day',
+    'results.how.goal.maintain': 'Maintenance calories, no adjustment',
+    'results.how.protein': 'Protein: {perKg} g/kg → {g} g ({kcal} kcal)',
+    'results.how.fat': 'Fat: 25% of calories (0.6 g/kg floor) → {g} g ({kcal} kcal)',
+    'results.how.carbs': 'Carbs: the remaining calories → {g} g ({kcal} kcal)',
+    'warn.kcalFloor':
+      'The result fell below the safe minimum and was adjusted up. Consult a professional before following such a restrictive diet.',
+    'warn.lowCarbs':
+      'With this deficit your carbs are low for your activity level. Consider a gentler pace.',
+    'warn.bmiRange':
+      'At a high BMI the formulas lose accuracy. Treat this as guidance and consider professional advice.',
+    'warn.ageRange': 'Past age 65 the standard formulas lose accuracy. Treat this as guidance.',
   },
 } as const;
 
 export type MessageKey = keyof (typeof messages)['es'];
 
-export function t(lang: Lang, key: MessageKey): string {
-  return messages[lang][key] ?? messages.es[key] ?? key;
+export function t(lang: Lang, key: MessageKey, params?: Record<string, string | number>): string {
+  let text: string = messages[lang][key] ?? messages.es[key] ?? key;
+  if (params) {
+    for (const [name, value] of Object.entries(params)) {
+      text = text.replaceAll(`{${name}}`, String(value));
+    }
+  }
+  return text;
 }
 
 export function getInitialLang(): Lang {
