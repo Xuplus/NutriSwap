@@ -5,6 +5,7 @@ import {
   loadCategoryProducts,
   loadProductById,
   loadProductsIndex,
+  normalize,
   searchFoods,
   type FoodItem,
   type ProductIndexEntry,
@@ -21,6 +22,7 @@ export function Equivalence({ lang }: { lang: Lang }) {
   const [portion, setPortion] = useState('200');
   const [includeProducts, setIncludeProducts] = useState(false);
   const [strictOnly, setStrictOnly] = useState(false);
+  const [filter, setFilter] = useState('');
   const [candidates, setCandidates] = useState<FoodItem[] | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -80,16 +82,31 @@ export function Equivalence({ lang }: { lang: Lang }) {
   }, [selected, includeProducts]);
 
   const portionG = parseFloat(portion.replace(',', '.')) || 0;
-  const results = useMemo<Equivalent[]>(() => {
+  // Unbounded ranking so the text filter below can reach matches beyond the top 20.
+  const allResults = useMemo<Equivalent[]>(() => {
     if (!selected || !candidates || portionG <= 0) return [];
     return findEquivalents(selected, candidates, {
       portionG,
       maxDistance: strictOnly ? 0.16 : 0.25,
+      limit: Infinity,
     });
   }, [selected, candidates, portionG, strictOnly]);
 
+  const results = useMemo<Equivalent[]>(() => {
+    const tokens = normalize(filter).split(/\s+/).filter(Boolean);
+    const filtered =
+      tokens.length === 0
+        ? allResults
+        : allResults.filter((r) => {
+            const hay = normalize(`${r.food.name.es} ${r.food.brand ?? ''}`);
+            return tokens.every((token) => hay.includes(token));
+          });
+    return filtered.slice(0, 20);
+  }, [allResults, filter]);
+
   async function pick(s: Suggestion) {
     setQuery('');
+    setFilter('');
     if (s.kind === 'core') {
       setSelected(s.food);
     } else {
@@ -183,10 +200,22 @@ export function Equivalence({ lang }: { lang: Lang }) {
             {selected.per_100g.carbs} g · G {selected.per_100g.fat} g (100 g)
             {selected.brand ? ` — ${selected.brand}` : ''}
           </p>
+          {!loading && allResults.length > 0 && (
+            <input
+              type="search"
+              class="filter-input"
+              placeholder={t(lang, 'eq.filter.placeholder')}
+              value={filter}
+              onInput={(e) => setFilter(e.currentTarget.value)}
+              aria-label={t(lang, 'eq.filter.placeholder')}
+            />
+          )}
           {loading ? (
             <p class="placeholder">{t(lang, 'eq.loading')}</p>
           ) : results.length === 0 ? (
-            <p class="placeholder">{t(lang, 'eq.results.empty')}</p>
+            <p class="placeholder">
+              {allResults.length > 0 ? t(lang, 'eq.filter.noMatch') : t(lang, 'eq.results.empty')}
+            </p>
           ) : (
             <ul class="eq-list">
               {results.map((r) => (

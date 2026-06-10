@@ -39,6 +39,9 @@ export const messages = {
     'eq.results.anchor.fat': 'igualando la grasa',
     'eq.results.empty':
       'No encontramos equivalencias claras. Prueba con otra cantidad o activa los productos de supermercado.',
+    'eq.filter.placeholder': 'Filtrar resultados… p. ej. atún',
+    'eq.filter.noMatch':
+      'Ningún equivalente coincide con el filtro. Prueba con otro término o activa los productos de supermercado.',
     'eq.loading': 'Cargando…',
     'eq.quality.excellent': 'Excelente',
     'eq.quality.good': 'Buena',
@@ -189,6 +192,9 @@ export const messages = {
     'eq.results.anchor.fat': 'matching fat',
     'eq.results.empty':
       'No clear equivalents found. Try another amount or enable supermarket products.',
+    'eq.filter.placeholder': 'Filter results… e.g. tuna',
+    'eq.filter.noMatch':
+      'No equivalents match the filter. Try another term or enable supermarket products.',
     'eq.loading': 'Loading…',
     'eq.quality.excellent': 'Excellent',
     'eq.quality.good': 'Good',
