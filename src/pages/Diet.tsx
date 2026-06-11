@@ -22,6 +22,7 @@ import {
   type FoodItem,
   type ProductIndexEntry,
 } from '../lib/foods';
+import { suggestFoods, type MacroGap, type Suggestion as GapSuggestion } from '../lib/suggest';
 
 type Suggestion = { kind: 'core'; food: FoodItem } | { kind: 'product'; entry: ProductIndexEntry };
 
@@ -117,15 +118,43 @@ export function Diet({ lang }: { lang: Lang }) {
 
   const totals = useMemo(() => dietTotals(diet), [diet]);
 
-  async function addSuggestion(mealIndex: number, s: Suggestion) {
-    const food = s.kind === 'core' ? s.food : await loadProductById(s.entry);
-    if (!food) return;
+  const gap = useMemo<MacroGap | null>(
+    () =>
+      targets
+        ? {
+            protein: targets.proteinG - totals.protein,
+            carbs: targets.carbsG - totals.carbs,
+            fat: targets.fatG - totals.fat,
+          }
+        : null,
+    [targets, totals],
+  );
+
+  const dayComplete = useMemo(() => {
+    if (!targets || totals.kcal === 0) return false;
+    const inBand = (current: number, target: number) =>
+      target <= 0 || (current / target >= 0.93 && current / target <= 1.07);
+    return (
+      inBand(totals.kcal, targets.goalKcal) &&
+      inBand(totals.protein, targets.proteinG) &&
+      inBand(totals.carbs, targets.carbsG) &&
+      inBand(totals.fat, targets.fatG)
+    );
+  }, [targets, totals]);
+
+  function addFood(mealIndex: number, food: FoodItem, grams = 100) {
     setDiet((d) => {
       const meals = d.meals.map((m, i) =>
-        i === mealIndex ? { ...m, items: [...m.items, snapshotFood(food)] } : m,
+        i === mealIndex ? { ...m, items: [...m.items, snapshotFood(food, grams)] } : m,
       );
       return { meals };
     });
+  }
+
+  async function addSuggestion(mealIndex: number, s: Suggestion, grams = 100) {
+    const food = s.kind === 'core' ? s.food : await loadProductById(s.entry);
+    if (!food) return;
+    addFood(mealIndex, food, grams);
     setQuery('');
     setSearchAt(null);
   }
@@ -214,6 +243,12 @@ export function Diet({ lang }: { lang: Lang }) {
         <div class="diet-meals">
           {diet.meals.map((meal, mi) => {
             const mt = mealTotals(meal);
+            const chips: GapSuggestion[] =
+              gap && searchAt !== mi ? suggestFoods(gap, meal.nameKey, diet, core, 3) : [];
+            const preRanked: GapSuggestion[] =
+              gap && searchAt === mi && query.trim().length < 2
+                ? suggestFoods(gap, meal.nameKey, diet, core, 6)
+                : [];
             return (
               <div class="panel meal" key={meal.nameKey}>
                 <div class="meal-head">
@@ -260,6 +295,27 @@ export function Diet({ lang }: { lang: Lang }) {
                     );
                   })}
                 </ul>
+                {chips.length > 0 && (
+                  <div class="suggestion-chips">
+                    <span class="chips-label">{t(lang, 'diet.suggestions')}</span>
+                    {chips.map((s) => (
+                      <button
+                        type="button"
+                        class="suggestion-chip"
+                        key={s.food.id}
+                        onClick={() => addFood(mi, s.food, s.grams)}
+                      >
+                        <span class="chip-main">
+                          ＋ {s.grams} g · {s.food.name.es}
+                        </span>
+                        <span class="chip-adds">
+                          +{s.adds.protein}P · +{s.adds.carbs}C · +{s.adds.fat}G · {s.adds.kcal}{' '}
+                          kcal
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                )}
                 {searchAt === mi ? (
                   <div class="search-box">
                     <input
@@ -270,6 +326,26 @@ export function Diet({ lang }: { lang: Lang }) {
                       onInput={(e) => setQuery(e.currentTarget.value)}
                       aria-label={t(lang, 'diet.search.placeholder')}
                     />
+                    {preRanked.length > 0 && (
+                      <ul class="suggestions" role="listbox">
+                        {preRanked.map((s) => (
+                          <li key={s.food.id}>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                addFood(mi, s.food, s.grams);
+                                setQuery('');
+                                setSearchAt(null);
+                              }}
+                            >
+                              <strong>{s.food.name.es}</strong>
+                              <span class="tag">{s.grams} g</span>
+                              <span class="tag">+{s.adds.kcal} kcal</span>
+                            </button>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
                     {suggestions.length > 0 && (
                       <ul class="suggestions" role="listbox">
                         {suggestions.map((s) => (
@@ -349,6 +425,7 @@ export function Diet({ lang }: { lang: Lang }) {
             current={totals.fat}
             target={targets.fatG}
           />
+          {dayComplete && <p class="day-complete">🎉 {t(lang, 'diet.complete')}</p>}
           <p class="hint">
             {t(lang, 'diet.targetsNote', {
               goal: t(lang, `goal.${loadForm().goal}` as MessageKey),

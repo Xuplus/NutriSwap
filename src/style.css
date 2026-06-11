@@ -673,6 +673,59 @@ details summary {
   text-align: right;
 }
 
+.suggestion-chips {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 0.6rem 0 0.2rem;
+}
+
+.chips-label {
+  font-size: 0.78rem;
+  color: var(--muted);
+  width: 100%;
+}
+
+.suggestion-chip {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.1rem;
+  background: #ecf3ec;
+  border: 1px solid var(--accent);
+  border-radius: 10px;
+  padding: 0.35rem 0.65rem;
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.85rem;
+  color: var(--accent-dark);
+  text-align: left;
+}
+
+.suggestion-chip:hover {
+  background: #dcebdc;
+}
+
+.chip-main {
+  font-weight: 600;
+}
+
+.chip-adds {
+  font-size: 0.72rem;
+  color: var(--muted);
+}
+
+.day-complete {
+  background: #e3f3e4;
+  border: 1px solid #2c8c3c;
+  border-radius: 8px;
+  padding: 0.6rem 0.8rem;
+  font-weight: 600;
+  color: #226b2c;
+  font-size: 0.9rem;
+}
+
 .progress-row {
   margin: 0.9rem 0;
 }

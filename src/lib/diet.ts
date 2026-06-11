@@ -15,6 +15,8 @@ export interface DietItem {
   /** Id of the source food (kept for future deep-links); data below is a snapshot. */
   foodId: string;
   name: string;
+  /** Optional: absent in diets saved before suggestions existed. */
+  category?: string;
   per_100g: Per100g;
   grams: number;
 }
@@ -97,7 +99,13 @@ function sum(parts: Per100g[]): Per100g {
 }
 
 export function snapshotFood(food: FoodItem, grams = 100): DietItem {
-  return { foodId: food.id, name: food.name.es, per_100g: food.per_100g, grams };
+  return {
+    foodId: food.id,
+    name: food.name.es,
+    category: food.category,
+    per_100g: food.per_100g,
+    grams,
+  };
 }
 
 const STORAGE_KEY = 'nutriswap.diet';
