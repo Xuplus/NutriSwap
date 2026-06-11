@@ -47,7 +47,8 @@ calculation engines trivially unit-testable.
 ## Phase 1 — Data pipeline (the foundation of the equivalence tool)
 
 - [x] BEDCA fetcher: query the XML API (`procquery.php`), pull all foods + macros,
-      normalize to the canonical schema. → 808 generic foods with complete macros.
+      normalize to the canonical schema. → 1,037 generic foods (incl. Atwater energy
+      reconstruction, carb imputation, cross-library dedupe and a small USDA supplement).
 - [x] OFF importer: Parquet export from Hugging Face via DuckDB, filtered to Spain +
       major stores, with quality filters. → 21,815 products.
 - [x] Normalization rules: per-100g basis, kJ→kcal, dedupe by name+brand keeping the

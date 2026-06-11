@@ -11,7 +11,7 @@ export interface Per100g {
 export interface FoodItem {
   id: string;
   name: { es: string; en?: string };
-  source: 'bedca' | 'off';
+  source: 'bedca' | 'off' | 'usda';
   category: string;
   brand?: string | null;
   stores?: string[];

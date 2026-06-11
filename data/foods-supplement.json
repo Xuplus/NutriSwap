@@ -1,0 +1,27 @@
+{
+  "comment": "Hand-curated staples genuinely absent from BEDCA's public data. Values per 100 g from USDA FoodData Central (FDC ids noted). Keep this list short: only everyday foods users expect to find.",
+  "foods": [
+    {
+      "id": "suppl-chicken-breast-raw",
+      "name": {
+        "es": "Pollo, pechuga, sin piel, cruda",
+        "en": "Chicken breast, skinless, raw"
+      },
+      "source": "usda",
+      "category": "carnes",
+      "per_100g": { "kcal": 120, "protein": 22.5, "carbs": 0, "fat": 2.6, "fiber": 0 },
+      "ref": "USDA FDC 171477 (chicken, broilers or fryers, breast, meat only, raw)"
+    },
+    {
+      "id": "suppl-turkey-breast-raw",
+      "name": {
+        "es": "Pavo, pechuga, sin piel, cruda",
+        "en": "Turkey breast, skinless, raw"
+      },
+      "source": "usda",
+      "category": "carnes",
+      "per_100g": { "kcal": 114, "protein": 23.7, "carbs": 0, "fat": 1.5, "fiber": 0 },
+      "ref": "USDA FDC 171482 (turkey, breast, meat only, raw)"
+    }
+  ]
+}

@@ -27,6 +27,12 @@ export function Attribution({ lang }: { lang: Lang }) {
             ODbL 1.0
           </a>
         </p>
+        <h2>
+          <a href="https://fdc.nal.usda.gov" target="_blank" rel="noopener noreferrer">
+            USDA FoodData Central
+          </a>
+        </h2>
+        <p>{t(lang, 'attribution.usda.desc')}</p>
         <p>{t(lang, 'attribution.method')}</p>
         <p>
           <a href="https://github.com/Xuplus/NutriSwap" target="_blank" rel="noopener noreferrer">

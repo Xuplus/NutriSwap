@@ -17,7 +17,7 @@ Data pipeline (regenerates `public/data/`; outputs are committed):
 
 ```bash
 node scripts/fetch-bedca.mjs        # BEDCA XML API → data/raw/bedca-raw.json (gitignored)
-node scripts/build-foods-core.mjs   # → public/data/foods-core.json (~808 generic foods)
+node scripts/build-foods-core.mjs   # → public/data/foods-core.json (~1,000 generic foods)
 # OFF needs the ~7 GB parquet first:
 curl -L -o data/raw/off-food.parquet "https://huggingface.co/datasets/openfoodfacts/product-database/resolve/main/food.parquet"
 node scripts/extract-off.mjs        # DuckDB → public/data/products/*.json + products-index.json
@@ -33,7 +33,11 @@ Two-layer dataset, one canonical schema (`FoodItem` in `src/lib/foods.ts`, macro
 100 g):
 
 - **BEDCA generics** (`foods-core.json`, small, loaded eagerly) — lab-analyzed Spanish
-  foods, the trusted core for equivalences.
+  foods, the trusted core for equivalences. BEDCA aggregates several libraries with
+  incomplete public components; the build script reconstructs missing energy via
+  Atwater, imputes missing carbs (0 for animal categories), and collapses same-name
+  duplicates preferring measured energy. `data/foods-supplement.json` adds a few
+  hand-curated USDA staples that BEDCA lacks entirely.
 - **OFF supermarket products** (`products/<category>.json` chunks + a compact
   `products-index.json` for search) — loaded lazily only when the user opts in, because
   the index is ~2 MB. Both layers share the 15-slug category taxonomy defined in

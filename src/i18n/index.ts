@@ -74,6 +74,8 @@ export const messages = {
       'Los alimentos genéricos provienen de BEDCA, la Base de Datos Española de Composición de Alimentos (AESAN y red de centros de investigación). Datos de acceso público.',
     'attribution.off.desc':
       'Los productos de supermercado provienen de Open Food Facts, base de datos colaborativa y abierta, bajo licencia Open Database License (ODbL). Nuestro conjunto de datos derivado está disponible en el repositorio del proyecto bajo la misma licencia.',
+    'attribution.usda.desc':
+      'Unos pocos alimentos básicos ausentes de BEDCA (p. ej. pechuga de pollo sin piel cruda) provienen de USDA FoodData Central, de dominio público.',
     'attribution.method':
       'La metodología de cálculo (fórmulas, fuentes científicas y reglas de equivalencia) está documentada en el repositorio.',
     'attribution.repo': 'Código fuente y datos derivados en GitHub',
@@ -227,6 +229,8 @@ export const messages = {
       'Generic foods come from BEDCA, the Spanish Food Composition Database (AESAN and a network of research centers). Publicly accessible data.',
     'attribution.off.desc':
       'Supermarket products come from Open Food Facts, the collaborative open database, under the Open Database License (ODbL). Our derived dataset is available in the project repository under the same license.',
+    'attribution.usda.desc':
+      'A few staples missing from BEDCA (e.g. raw skinless chicken breast) come from USDA FoodData Central, public domain.',
     'attribution.method':
       'The calculation methodology (formulas, scientific sources and equivalence rules) is documented in the repository.',
     'attribution.repo': 'Source code and derived data on GitHub',
