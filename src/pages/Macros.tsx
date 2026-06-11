@@ -2,105 +2,22 @@ import { useEffect, useMemo, useState } from 'preact/hooks';
 import { t, type Lang, type MessageKey } from '../i18n';
 import {
   calculateMacros,
-  type Activity,
   type ActivityLevel,
   type Aggressiveness,
   type ExerciseType,
   type Experience,
   type Goal,
-  type GoalInput,
-  type Profile,
   type Sex,
   EXERCISE_MET,
   ACTIVITY_FACTORS,
 } from '../lib/macros';
-
-interface FormState {
-  sex: Sex;
-  age: string;
-  weight: string;
-  height: string;
-  bodyfat: string;
-  mode: 'steps' | 'level';
-  steps: string;
-  level: ActivityLevel;
-  exercise: { type: ExerciseType; minutes: string }[];
-  goal: Goal;
-  aggressiveness: Aggressiveness;
-  experience: Experience;
-}
-
-const DEFAULT_FORM: FormState = {
-  sex: 'male',
-  age: '',
-  weight: '',
-  height: '',
-  bodyfat: '',
-  mode: 'steps',
-  steps: '',
-  level: 'sedentary',
-  exercise: [],
-  goal: 'maintain',
-  aggressiveness: 'standard',
-  experience: 'beginner',
-};
-
-const STORAGE_KEY = 'nutriswap.profile';
-
-function loadForm(): FormState {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw) return { ...DEFAULT_FORM, ...JSON.parse(raw) };
-  } catch {
-    /* corrupted storage — start fresh */
-  }
-  return DEFAULT_FORM;
-}
-
-function num(s: string): number | undefined {
-  const n = parseFloat(s.replace(',', '.'));
-  return Number.isFinite(n) && n > 0 ? n : undefined;
-}
-
-function parseInputs(
-  f: FormState,
-): { profile: Profile; activity: Activity; goal: GoalInput } | null {
-  const age = num(f.age);
-  const weight = num(f.weight);
-  const height = num(f.height);
-  if (!age || !weight || !height) return null;
-  if (age < 14 || age > 100 || weight < 30 || weight > 300 || height < 120 || height > 230) {
-    return null;
-  }
-  const profile: Profile = {
-    sex: f.sex,
-    age,
-    weightKg: weight,
-    heightCm: height,
-    bodyFatPct: num(f.bodyfat),
-  };
-  const activity: Activity =
-    f.mode === 'steps'
-      ? {
-          avgDailySteps: num(f.steps) ?? 0,
-          exercise: f.exercise
-            .map((e) => ({ type: e.type, minutesPerWeek: num(e.minutes) ?? 0 }))
-            .filter((e) => e.minutesPerWeek > 0),
-        }
-      : { level: f.level };
-  const goal: GoalInput = {
-    goal: f.goal,
-    aggressiveness: f.aggressiveness,
-    experience: f.experience,
-  };
-  return { profile, activity, goal };
-}
+import { loadForm, parseInputs, saveForm, type FormState } from '../lib/profile';
 
 export function Macros({ lang }: { lang: Lang }) {
   const [form, setForm] = useState<FormState>(loadForm);
 
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(form));
+    saveForm(form);
   }, [form]);
 
   const set = <K extends keyof FormState>(key: K, value: FormState[K]) =>
@@ -423,8 +340,11 @@ export function Macros({ lang }: { lang: Lang }) {
                 </ul>
               </details>
               <p class="hint">{t(lang, 'results.fiber', { g: result.fiberG })}</p>
-              <p>
-                <a class="button" href="#/equivalence">
+              <p class="results-actions">
+                <a class="button" href="#/diet">
+                  {t(lang, 'results.toDiet')}
+                </a>{' '}
+                <a class="button secondary" href="#/equivalence">
                   {t(lang, 'results.toEquivalence')}
                 </a>
               </p>

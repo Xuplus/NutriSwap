@@ -9,6 +9,7 @@ describe('parseHash', () => {
     expect(parseHash('#/macros')).toBe('macros');
     expect(parseHash('#/macros/')).toBe('macros');
     expect(parseHash('#/equivalence')).toBe('equivalence');
+    expect(parseHash('#/diet')).toBe('diet');
     expect(parseHash('#/attribution')).toBe('attribution');
     expect(parseHash('#/does-not-exist')).toBe('not-found');
   });

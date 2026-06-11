@@ -108,7 +108,9 @@ Tasks:
 
 ## Later ideas (out of scope for v1)
 
-- Daily meal builder that fills the user's macros from chosen foods.
+- [x] ~~Daily meal builder that fills the user's macros from chosen foods.~~ Shipped as
+      "Mi dieta" (`#/diet`): meals per day, per-meal food search, live progress bars
+      against the calculator's targets.
 - Barcode lookup (camera) against the OFF dataset.
 - Micronutrients (BEDCA has up to 39 values per food).
 - Price-aware equivalences (no good open price API for Spanish supermarkets; would need scraping — legally murky, skip).

@@ -4,6 +4,7 @@ import { parseHash, routeHref, type Route } from './router';
 import { Home } from './pages/Home';
 import { Macros } from './pages/Macros';
 import { Equivalence } from './pages/Equivalence';
+import { Diet } from './pages/Diet';
 import { Attribution } from './pages/Attribution';
 import { NotFound } from './pages/NotFound';
 
@@ -23,6 +24,7 @@ export function App() {
     { route: 'home', label: t(lang, 'nav.home') },
     { route: 'macros', label: t(lang, 'nav.macros') },
     { route: 'equivalence', label: t(lang, 'nav.equivalence') },
+    { route: 'diet', label: t(lang, 'nav.diet') },
   ] as const;
 
   return (
@@ -60,6 +62,7 @@ export function App() {
         {route === 'home' && <Home lang={lang} />}
         {route === 'macros' && <Macros lang={lang} />}
         {route === 'equivalence' && <Equivalence lang={lang} />}
+        {route === 'diet' && <Diet lang={lang} />}
         {route === 'attribution' && <Attribution lang={lang} />}
         {route === 'not-found' && <NotFound lang={lang} />}
       </main>
