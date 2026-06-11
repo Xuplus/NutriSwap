@@ -145,6 +145,18 @@ for (const s of supplement.foods) {
   foods.push(s);
 }
 
+// Macro corrections for BEDCA entries with implausible published values.
+let overridesApplied = 0;
+for (const o of supplement.overrides ?? []) {
+  const target = foods.find((f) => f.id === o.id);
+  if (!target) {
+    console.warn(`override target not found: ${o.id}`);
+    continue;
+  }
+  target.per_100g = o.per_100g;
+  overridesApplied++;
+}
+
 foods.sort((a, b) => a.name.es.localeCompare(b.name.es, 'es'));
 
 await mkdir('public/data', { recursive: true });
@@ -160,7 +172,9 @@ await writeFile('public/data/foods-core.json', JSON.stringify(out));
 console.log(`Wrote public/data/foods-core.json: ${foods.length} foods`);
 console.log(`Rescued: ${rescued.energy} energy reconstructions, ${rescued.carbs} carb imputations`);
 console.log(`Dropped: ${JSON.stringify(skipped)}, ${duplicatesDropped} same-name duplicates`);
-console.log(`Supplement: ${supplement.foods.length} curated foods`);
+console.log(
+  `Supplement: ${supplement.foods.length} curated foods, ${overridesApplied} overrides applied`,
+);
 const byCat = {};
 for (const f of foods) byCat[f.category] = (byCat[f.category] ?? 0) + 1;
 console.log('By category:', byCat);

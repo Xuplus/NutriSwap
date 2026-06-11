@@ -1,5 +1,5 @@
 {
-  "comment": "Hand-curated staples genuinely absent from BEDCA's public data. Values per 100 g from USDA FoodData Central (FDC ids noted). Keep this list short: only everyday foods users expect to find.",
+  "comment": "Hand-curated corrections to the BEDCA-derived dataset. 'foods' adds staples genuinely absent from BEDCA's public data; 'overrides' replaces macros of BEDCA entries whose published values are implausible (see refs). Values per 100 g from USDA FoodData Central. Keep both lists short.",
   "foods": [
     {
       "id": "suppl-chicken-breast-raw",
@@ -22,6 +22,20 @@
       "category": "carnes",
       "per_100g": { "kcal": 114, "protein": 23.7, "carbs": 0, "fat": 1.5, "fiber": 0 },
       "ref": "USDA FDC 171482 (turkey, breast, meat only, raw)"
+    }
+  ],
+  "overrides": [
+    {
+      "id": "bedca-994",
+      "reason": "BEDCA publishes 1.2 g fat/100 g for skin-on raw chicken breast — the fatty-acid profile of lean meat only. Chicken skin is ~1/3 fat, so the value is implausible for the labelled cut.",
+      "per_100g": { "kcal": 172, "protein": 20.9, "carbs": 0, "fat": 9.3, "fiber": 0 },
+      "ref": "USDA FDC 171474 (chicken, broilers or fryers, breast, meat and skin, raw)"
+    },
+    {
+      "id": "bedca-2288",
+      "reason": "BEDCA publishes 0.99 g fat/100 g for skin-on raw turkey breast; same lean-meat-only artifact as bedca-994.",
+      "per_100g": { "kcal": 157, "protein": 21.9, "carbs": 0, "fat": 7.0, "fiber": 0 },
+      "ref": "USDA FDC 171093 (turkey, all classes, breast, meat and skin, raw)"
     }
   ]
 }
