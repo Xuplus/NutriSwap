@@ -113,7 +113,39 @@ Tasks:
       against the calculator's targets.
 - Barcode lookup (camera) against the OFF dataset.
 - Micronutrients (BEDCA has up to 39 values per food).
-- Price-aware equivalences (no good open price API for Spanish supermarkets; would need scraping — legally murky, skip).
+- Price-aware equivalences — researched in depth, see "Price integration" below.
+
+## Price integration (researched 2026-06, parked)
+
+Goal: €/portion on equivalence results (with optional price sort), day cost in the
+diet builder, and a budget mode for suggestions — because healthy diets failing on
+cost is a real adherence problem.
+
+Source findings (verified 2026-06-12):
+
+| Source | Verdict |
+|---|---|
+| [Open Prices](https://prices.openfoodfacts.org) (OFF sister project, ODbL, barcode-linked) | Only ~1,000 Spanish price points ever; 220 of our 21,815 products (1%) matched in their parquet dump. Too thin today — **recheck yearly**, it's the right long-term source for branded products. |
+| Mercadona store API (`tienda.mercadona.es/api/categories/`, unauthenticated JSON) | **Best practical source.** Returns `price_instructions.bulk_price` = €/kg-or-L for ~4,500 products incl. fresh counters (verified live). ~200 requests for a full fetch. No barcodes → no clean OFF join; map BEDCA generics to representative products instead. ToS grey zone: monthly low-volume build-time fetch, identifying UA; committed JSON output means the site degrades gracefully if the API changes. |
+| MAPA Panel de Consumo (official €/kg household averages, 624 categories) | Online query tool only, no clean bulk download — use to **cross-check** Mercadona-derived numbers, not as the automated source. |
+| Scraped community datasets (Data-Market etc.) | Stale samples marketing paid services. Discard. |
+
+Design decided (apply when resumed):
+
+- `data/food-prices.json`: ~150 common BEDCA generics mapped to Mercadona products;
+  store median €/kg + source + date per entry. Raw/simple foods only — cooked BEDCA
+  variants stay unpriced until a cooking-yield table exists (raw→cooked weight loss
+  would otherwise understate cost ~25%).
+- **Missing prices must never penalize a food nutritionally, and partial sums must
+  never look like totals**: default equivalence sort unchanged (similarity); opt-in
+  price sort places unpriced rows under a visible "sin precio" divider, still ranked
+  by match quality; diet day cost shown as partial with "N alimentos sin precio"
+  (hidden if nothing is priced); budget-mode suggestions rank gap-closed-per-euro
+  among priced foods only, falling back to unpriced candidates for slots with no
+  priced option. Never display imputed category-median prices.
+- Phases: **A** fetch script + generic mapping + equivalence price/sort + diet day
+  cost; **B** "modo ahorro" suggestion re-rank; **C** Open Prices barcode join for
+  branded products when Spanish coverage matures.
 
 ## Risks & mitigations
 

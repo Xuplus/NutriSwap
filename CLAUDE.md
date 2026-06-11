@@ -98,3 +98,8 @@ pipeline scripts, not the app.
 Commit directly to `main` and push; split work into small per-feature commits.
 `docs/research/` and `PLAN.md` are the source of truth for methodology and roadmap —
 keep them in sync with code changes.
+
+Food **price integration is researched and parked** — before re-investigating
+sources or designing UX for it, read "Price integration" in `PLAN.md` (source
+verdicts incl. verified coverage numbers, decided UX rules for missing prices, and
+phasing).
