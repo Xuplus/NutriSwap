@@ -21,7 +21,15 @@ node scripts/build-foods-core.mjs   # → public/data/foods-core.json (~1,000 ge
 # OFF needs the ~7 GB parquet first:
 curl -L -o data/raw/off-food.parquet "https://huggingface.co/datasets/openfoodfacts/product-database/resolve/main/food.parquet"
 node scripts/extract-off.mjs        # DuckDB → public/data/products/*.json + products-index.json
+node scripts/audit-foods.mjs        # report-only: flags implausible entries for human review
 ```
+
+After a data refresh, run the audit and review its findings. Confirmed errors get an
+entry in the `overrides` array of `data/foods-supplement.json` (replaces `per_100g`
+and/or `category` by id, with a `reason` and a USDA FDC `ref`), then re-run
+`build-foods-core.mjs`. Verify suspect values against the USDA API
+(`https://api.nal.usda.gov/fdc/v1/foods/search?api_key=DEMO_KEY&query=...`) before
+overriding — never guess corrections.
 
 ## Architecture
 
@@ -37,7 +45,8 @@ Two-layer dataset, one canonical schema (`FoodItem` in `src/lib/foods.ts`, macro
   incomplete public components; the build script reconstructs missing energy via
   Atwater, imputes missing carbs (0 for animal categories), and collapses same-name
   duplicates preferring measured energy. `data/foods-supplement.json` adds a few
-  hand-curated USDA staples that BEDCA lacks entirely.
+  hand-curated USDA staples that BEDCA lacks entirely and carries the `overrides`
+  list that corrects entries with implausible published values.
 - **OFF supermarket products** (`products/<category>.json` chunks + a compact
   `products-index.json` for search) — loaded lazily only when the user opts in, because
   the index is ~2 MB. Both layers share the 15-slug category taxonomy defined in
@@ -51,6 +60,20 @@ Engines are pure functions, separated from UI and individually tested:
   exactly. Don't change constants without updating the research doc and tests together.
 - `src/lib/equivalence.ts` — macro profiles as calorie shares, category-compatibility
   map, Euclidean similarity, gram conversion anchored on the dominant macro.
+- `src/lib/diet.ts` — diet-builder model: meals per day with named layouts, totals,
+  localStorage persistence. Diet items are **snapshots** (name + macros at add time),
+  so saved diets survive dataset refreshes; resizing meal count merges orphaned items
+  into the last meal instead of dropping them.
+- `src/lib/suggest.ts` — gap-fit suggestions for the diet builder: scores BEDCA
+  generics by how much a realistic portion reduces the kcal-weighted remaining gap
+  (overshoot penalized double). Realism lives in data at the top of the file:
+  meal-affinity map, per-category portion ranges (special cases: nuts, cheese,
+  toppings), a per-suggestion energy cap, and name-based exclusions for
+  powders/flours/herbs/condiments. When a weird suggestion shows up, fix it in those
+  lists, not in the scorer.
+- `src/lib/profile.ts` — the calculator's form state (localStorage `nutriswap.profile`)
+  and its parsing into engine inputs. Shared by the Macros page (form) and the Diet
+  page (targets), so both always agree; don't duplicate this parsing.
 
 UI pages (`src/pages/`) receive `lang` as a prop. Routing is **hash-based**
 (`src/router.ts`) because GitHub Pages has no SPA fallback — keep new routes as
