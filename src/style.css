@@ -42,6 +42,7 @@ body {
   border-bottom: 1px solid var(--border);
   position: sticky;
   top: 0;
+  z-index: 50; /* above dropdowns/panels that scroll under it */
 }
 
 .brand {
@@ -603,7 +604,14 @@ details summary {
 
 .diet-summary {
   position: sticky;
-  top: 6.5rem;
+  top: 5rem;
+}
+
+@media (max-width: 760px) {
+  /* In single-column layout a sticky summary would slide over the meal cards. */
+  .diet-summary {
+    position: static;
+  }
 }
 
 .meal-head {
@@ -783,4 +791,92 @@ details summary {
   text-align: center;
   color: var(--muted);
   font-size: 0.85rem;
+}
+
+/* ── Mobile (phones) ──────────────────────────────────────────────────────── */
+@media (max-width: 640px) {
+  /* Compact single-row header: brand · language · horizontally scrollable nav
+     (instead of four stacked rows eating a third of the screen). */
+  .header {
+    gap: 0.5rem 0.75rem;
+    padding: 0.5rem 1rem;
+  }
+
+  .brand {
+    font-size: 1rem;
+  }
+
+  .lang-switch {
+    order: 2;
+  }
+
+  .nav {
+    order: 3;
+    flex: 1;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    gap: 0.25rem;
+    padding-bottom: 0.15rem;
+    scrollbar-width: none;
+  }
+
+  .nav::-webkit-scrollbar {
+    display: none;
+  }
+
+  .nav a {
+    white-space: nowrap;
+    font-size: 0.9rem;
+  }
+
+  .main {
+    padding: 1.25rem 1rem;
+  }
+
+  .main h1 {
+    font-size: 1.5rem;
+  }
+
+  .hero h1 {
+    font-size: 1.6rem;
+  }
+
+  .panel {
+    padding: 1rem;
+  }
+
+  /* Equivalence rows: tighter grams column, badge flows with the text. */
+  .eq-row {
+    gap: 0.5rem;
+  }
+
+  .eq-row .grams {
+    min-width: 3.5rem;
+    font-size: 1rem;
+  }
+
+  /* Diet meal rows: let the controls wrap below long food names. */
+  .meal-item {
+    flex-wrap: wrap;
+  }
+
+  .meal-item-controls {
+    margin-left: auto;
+  }
+
+  .meal-item-kcal {
+    min-width: 3.5rem;
+  }
+
+  .suggestion-chip {
+    width: 100%;
+  }
+
+  .field-row {
+    flex-wrap: wrap;
+  }
+
+  .field-row > label {
+    min-width: 5.5rem;
+  }
 }
