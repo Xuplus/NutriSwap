@@ -36,6 +36,39 @@
       "reason": "BEDCA publishes 0.99 g fat/100 g for skin-on raw turkey breast; same lean-meat-only artifact as bedca-994.",
       "per_100g": { "kcal": 157, "protein": 21.9, "carbs": 0, "fat": 7.0, "fiber": 0 },
       "ref": "USDA FDC 171093 (turkey, all classes, breast, meat and skin, raw)"
+    },
+    {
+      "id": "bedca-2192",
+      "reason": "BEDCA's 'Garbanzo, hervido' declares 358.7 kcal — the energy of DRY chickpeas — alongside boiled-chickpea macros (Atwater ≈ 133 kcal).",
+      "per_100g": { "kcal": 164, "protein": 8.9, "carbs": 27.4, "fat": 2.6, "fiber": 7.6 },
+      "ref": "USDA FDC 173799 (chickpeas, mature seeds, cooked, boiled)"
+    },
+    {
+      "id": "bedca-1114",
+      "reason": "BEDCA's 'Maíz, en mazorca, crudo' carries dry-grain values (390 kcal, 85.6 g carbs); raw corn on the cob is ~86 kcal.",
+      "per_100g": { "kcal": 86, "protein": 3.3, "carbs": 18.7, "fat": 1.4, "fiber": 2.0 },
+      "ref": "USDA FDC 169998 (corn, sweet, yellow, raw)"
+    },
+    {
+      "id": "bedca-802",
+      "reason": "BEDCA's 'Bonito, enlatado en aceite, escurrido' declares 203.6 kcal but only 4.7 g fat (Atwater ≈ 147 kcal); oil-packed drained fish runs ~8 g fat.",
+      "per_100g": { "kcal": 198, "protein": 29.1, "carbs": 0, "fat": 8.2, "fiber": 0 },
+      "ref": "USDA FDC 173708 (tuna, light, canned in oil, drained solids)"
+    },
+    {
+      "id": "bedca-1239",
+      "reason": "'Cacahuete, frito, salado' sits in BEDCA's fish group; recategorized so it appears among legumes/nuts in the equivalence tool. Macros unchanged.",
+      "category": "legumbres-frutos-secos"
+    },
+    {
+      "id": "bedca-1633",
+      "reason": "'Avellana' sits in BEDCA's fruit group; recategorized to legumes/nuts. Macros unchanged.",
+      "category": "legumbres-frutos-secos"
+    },
+    {
+      "id": "bedca-1733",
+      "reason": "'Piñon' sits in BEDCA's fruit group; recategorized to legumes/nuts. Macros unchanged.",
+      "category": "legumbres-frutos-secos"
     }
   ]
 }

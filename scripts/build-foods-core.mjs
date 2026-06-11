@@ -145,7 +145,8 @@ for (const s of supplement.foods) {
   foods.push(s);
 }
 
-// Macro corrections for BEDCA entries with implausible published values.
+// Corrections for BEDCA entries with implausible published values or wrong
+// group assignments. An override may replace per_100g, category, or both.
 let overridesApplied = 0;
 for (const o of supplement.overrides ?? []) {
   const target = foods.find((f) => f.id === o.id);
@@ -153,7 +154,8 @@ for (const o of supplement.overrides ?? []) {
     console.warn(`override target not found: ${o.id}`);
     continue;
   }
-  target.per_100g = o.per_100g;
+  if (o.per_100g) target.per_100g = o.per_100g;
+  if (o.category) target.category = o.category;
   overridesApplied++;
 }
 
