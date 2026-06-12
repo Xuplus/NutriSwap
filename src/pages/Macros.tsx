@@ -155,20 +155,23 @@ export function Macros({ lang }: { lang: Lang }) {
                       </option>
                     ))}
                   </select>
-                  <input
-                    type="number"
-                    inputMode="numeric"
-                    min="0"
-                    max="2000"
-                    step="15"
-                    placeholder={t(lang, 'form.exercise.minutes')}
-                    value={row.minutes}
-                    onInput={(e) => {
-                      const exercise = [...form.exercise];
-                      exercise[i] = { ...row, minutes: e.currentTarget.value };
-                      set('exercise', exercise);
-                    }}
-                  />
+                  <span class="input-unit">
+                    <input
+                      type="number"
+                      inputMode="numeric"
+                      min="0"
+                      max="2000"
+                      step="15"
+                      aria-label={t(lang, 'form.exercise.minutes')}
+                      value={row.minutes}
+                      onInput={(e) => {
+                        const exercise = [...form.exercise];
+                        exercise[i] = { ...row, minutes: e.currentTarget.value };
+                        set('exercise', exercise);
+                      }}
+                    />
+                    <span class="unit">{t(lang, 'form.exercise.minutes')}</span>
+                  </span>
                   <button
                     type="button"
                     class="link-button"
