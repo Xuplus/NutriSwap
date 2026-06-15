@@ -19,6 +19,7 @@
     "@duckdb/node-api": "^1.5.3-r.3",
     "@eslint/js": "^9.14.0",
     "@preact/preset-vite": "^2.10.0",
+    "@types/node": "^25.9.3",
     "eslint": "^9.14.0",
     "eslint-config-prettier": "^9.1.0",
     "fast-xml-parser": "^5.8.0",

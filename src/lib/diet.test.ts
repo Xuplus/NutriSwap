@@ -1,12 +1,16 @@
 import { describe, expect, it } from 'vitest';
 import {
+  dayOverTargets,
   dietTotals,
   emptyDiet,
+  fitScaleFactor,
   itemMacros,
   MEAL_KEYS_BY_COUNT,
   mealTotals,
   resizeDiet,
+  scaleDietToFit,
   snapshotFood,
+  type DayTargets,
   type DietItem,
 } from './diet';
 import type { FoodItem } from './foods';
@@ -91,5 +95,44 @@ describe('resizeDiet', () => {
     expect(item.grams).toBe(100);
     expect(item.per_100g.protein).toBe(22.5);
     expect(item.name).toBe('Pechuga');
+  });
+});
+
+describe('scale-to-fit', () => {
+  // A day at exactly 1200 kcal of pure-carb rice (354 kcal, 77 C /100 g).
+  const targets: DayTargets = { kcal: 1000, protein: 200, carbs: 100, fat: 200 };
+
+  function overDay() {
+    const diet = emptyDiet(2);
+    diet.meals[0].items.push({ ...rice, grams: 200 }); // 708 kcal, 154 C
+    diet.meals[1].items.push({ ...rice, grams: 200 }); // 708 kcal, 154 C
+    return diet; // 1416 kcal, 308 C — over on kcal and carbs
+  }
+
+  it('detects when a metric is over target beyond tolerance', () => {
+    expect(dayOverTargets(dietTotals(overDay()), targets)).toBe(true);
+    expect(dayOverTargets(dietTotals(emptyDiet(2)), targets)).toBe(false);
+  });
+
+  it('factor is the smallest target/current ratio among over metrics', () => {
+    const totals = dietTotals(overDay()); // carbs 308 vs 100 is the worst overshoot
+    expect(fitScaleFactor(totals, targets)).toBeCloseTo(100 / 308, 4);
+  });
+
+  it('factor is 1 (no-op) when the day is within targets', () => {
+    expect(fitScaleFactor(dietTotals(emptyDiet(2)), targets)).toBe(1);
+  });
+
+  it('scaling brings every metric within target', () => {
+    const scaled = scaleDietToFit(overDay(), targets);
+    const t = dietTotals(scaled);
+    expect(t.kcal).toBeLessThanOrEqual(targets.kcal * 1.07);
+    expect(t.carbs).toBeLessThanOrEqual(targets.carbs * 1.07);
+  });
+
+  it('leaves an in-target day untouched', () => {
+    const diet = emptyDiet(2);
+    diet.meals[0].items.push({ ...rice, grams: 50 });
+    expect(scaleDietToFit(diet, targets)).toBe(diet);
   });
 });

@@ -98,6 +98,58 @@ function sum(parts: Per100g[]): Per100g {
   return total;
 }
 
+export interface DayTargets {
+  kcal: number;
+  protein: number;
+  carbs: number;
+  fat: number;
+}
+
+/** A metric counts as "over" past this ratio — matches the progress-bar threshold. */
+export const OVER_RATIO = 1.07;
+const FIT_GRAMS_STEP = 5;
+
+const TRACKED: (keyof DayTargets)[] = ['kcal', 'protein', 'carbs', 'fat'];
+
+/** True when any tracked metric exceeds its target beyond the tolerance. */
+export function dayOverTargets(totals: Per100g, targets: DayTargets): boolean {
+  return TRACKED.some((m) => targets[m] > 0 && totals[m] / targets[m] > OVER_RATIO);
+}
+
+/**
+ * Single factor that, applied to every portion, brings the *most* exceeded
+ * metric down onto its target (so nothing stays over). Returns 1 when the day
+ * is already within targets — callers can treat that as "nothing to do".
+ */
+export function fitScaleFactor(totals: Per100g, targets: DayTargets): number {
+  let factor = 1;
+  for (const m of TRACKED) {
+    if (targets[m] > 0 && totals[m] > targets[m]) {
+      factor = Math.min(factor, targets[m] / totals[m]);
+    }
+  }
+  return factor;
+}
+
+/**
+ * Scale every portion proportionally so the day fits within the targets. Macro
+ * ratios are preserved (it shrinks the whole day uniformly); a no-op when the
+ * day isn't over. Grams round to 5 g for tidy numbers.
+ */
+export function scaleDietToFit(diet: Diet, targets: DayTargets): Diet {
+  const factor = fitScaleFactor(dietTotals(diet), targets);
+  if (factor >= 1) return diet;
+  return {
+    meals: diet.meals.map((m) => ({
+      ...m,
+      items: m.items.map((it) => {
+        const scaled = Math.round((it.grams * factor) / FIT_GRAMS_STEP) * FIT_GRAMS_STEP;
+        return { ...it, grams: Math.max(FIT_GRAMS_STEP, scaled) };
+      }),
+    })),
+  };
+}
+
 export function snapshotFood(food: FoodItem, grams = 100): DietItem {
   return {
     foodId: food.id,

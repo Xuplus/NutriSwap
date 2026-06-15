@@ -1,0 +1,617 @@
+{
+  "presets": [
+    {
+      "id": "high-protein",
+      "name": {
+        "es": "Alto en proteína",
+        "en": "High protein"
+      },
+      "tags": [
+        "lose",
+        "gain"
+      ],
+      "kcal": 1950,
+      "meals": [
+        {
+          "nameKey": "meal.breakfast",
+          "items": [
+            {
+              "foodId": "bedca-1010",
+              "grams": 60
+            },
+            {
+              "foodId": "bedca-1316",
+              "grams": 250
+            },
+            {
+              "foodId": "bedca-2245",
+              "grams": 120
+            },
+            {
+              "foodId": "bedca-2127",
+              "grams": 50
+            }
+          ]
+        },
+        {
+          "nameKey": "meal.lunch",
+          "items": [
+            {
+              "foodId": "bedca-994",
+              "grams": 200
+            },
+            {
+              "foodId": "bedca-2660",
+              "grams": 70
+            },
+            {
+              "foodId": "bedca-1177",
+              "grams": 150
+            },
+            {
+              "foodId": "bedca-2543",
+              "grams": 10
+            }
+          ]
+        },
+        {
+          "nameKey": "meal.snack",
+          "items": [
+            {
+              "foodId": "bedca-1927",
+              "grams": 250
+            },
+            {
+              "foodId": "bedca-896",
+              "grams": 20
+            }
+          ]
+        },
+        {
+          "nameKey": "meal.dinner",
+          "items": [
+            {
+              "foodId": "bedca-825",
+              "grams": 220
+            },
+            {
+              "foodId": "bedca-2404",
+              "grams": 200
+            },
+            {
+              "foodId": "bedca-2421",
+              "grams": 100
+            },
+            {
+              "foodId": "bedca-2543",
+              "grams": 5
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "balanced",
+      "name": {
+        "es": "Equilibrado",
+        "en": "Balanced"
+      },
+      "tags": [
+        "maintain"
+      ],
+      "kcal": 1800,
+      "meals": [
+        {
+          "nameKey": "meal.breakfast",
+          "items": [
+            {
+              "foodId": "bedca-2163",
+              "grams": 100
+            },
+            {
+              "foodId": "bedca-2127",
+              "grams": 100
+            },
+            {
+              "foodId": "bedca-2421",
+              "grams": 80
+            },
+            {
+              "foodId": "bedca-2543",
+              "grams": 5
+            }
+          ]
+        },
+        {
+          "nameKey": "meal.lunch",
+          "items": [
+            {
+              "foodId": "bedca-1117",
+              "grams": 100
+            },
+            {
+              "foodId": "bedca-2133",
+              "grams": 120
+            },
+            {
+              "foodId": "bedca-2421",
+              "grams": 100
+            },
+            {
+              "foodId": "bedca-2543",
+              "grams": 10
+            }
+          ]
+        },
+        {
+          "nameKey": "meal.snack",
+          "items": [
+            {
+              "foodId": "bedca-1927",
+              "grams": 250
+            },
+            {
+              "foodId": "bedca-2245",
+              "grams": 100
+            }
+          ]
+        },
+        {
+          "nameKey": "meal.dinner",
+          "items": [
+            {
+              "foodId": "bedca-2628",
+              "grams": 180
+            },
+            {
+              "foodId": "bedca-2404",
+              "grams": 250
+            },
+            {
+              "foodId": "bedca-1177",
+              "grams": 120
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "vegetarian",
+      "name": {
+        "es": "Vegetariano",
+        "en": "Vegetarian"
+      },
+      "tags": [
+        "maintain"
+      ],
+      "kcal": 1850,
+      "meals": [
+        {
+          "nameKey": "meal.breakfast",
+          "items": [
+            {
+              "foodId": "bedca-1010",
+              "grams": 60
+            },
+            {
+              "foodId": "bedca-2493",
+              "grams": 250
+            },
+            {
+              "foodId": "bedca-2225",
+              "grams": 100
+            },
+            {
+              "foodId": "bedca-2201",
+              "grams": 20
+            }
+          ]
+        },
+        {
+          "nameKey": "meal.lunch",
+          "items": [
+            {
+              "foodId": "bedca-1065",
+              "grams": 80
+            },
+            {
+              "foodId": "bedca-2660",
+              "grams": 50
+            },
+            {
+              "foodId": "bedca-2409",
+              "grams": 100
+            },
+            {
+              "foodId": "bedca-2543",
+              "grams": 10
+            }
+          ]
+        },
+        {
+          "nameKey": "meal.snack",
+          "items": [
+            {
+              "foodId": "bedca-1927",
+              "grams": 200
+            },
+            {
+              "foodId": "bedca-2245",
+              "grams": 120
+            }
+          ]
+        },
+        {
+          "nameKey": "meal.dinner",
+          "items": [
+            {
+              "foodId": "bedca-2127",
+              "grams": 120
+            },
+            {
+              "foodId": "bedca-2191",
+              "grams": 150
+            },
+            {
+              "foodId": "bedca-2395",
+              "grams": 150
+            },
+            {
+              "foodId": "bedca-2543",
+              "grams": 10
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "low-carb",
+      "name": {
+        "es": "Bajo en carbohidratos",
+        "en": "Low carb"
+      },
+      "tags": [
+        "lose"
+      ],
+      "kcal": 1600,
+      "meals": [
+        {
+          "nameKey": "meal.breakfast",
+          "items": [
+            {
+              "foodId": "bedca-2127",
+              "grams": 150
+            },
+            {
+              "foodId": "bedca-2216",
+              "grams": 80
+            },
+            {
+              "foodId": "bedca-2421",
+              "grams": 80
+            }
+          ]
+        },
+        {
+          "nameKey": "meal.lunch",
+          "items": [
+            {
+              "foodId": "bedca-994",
+              "grams": 200
+            },
+            {
+              "foodId": "bedca-1177",
+              "grams": 200
+            },
+            {
+              "foodId": "bedca-2543",
+              "grams": 15
+            }
+          ]
+        },
+        {
+          "nameKey": "meal.snack",
+          "items": [
+            {
+              "foodId": "bedca-2517",
+              "grams": 150
+            },
+            {
+              "foodId": "bedca-896",
+              "grams": 25
+            }
+          ]
+        },
+        {
+          "nameKey": "meal.dinner",
+          "items": [
+            {
+              "foodId": "bedca-2628",
+              "grams": 180
+            },
+            {
+              "foodId": "bedca-2376",
+              "grams": 200
+            },
+            {
+              "foodId": "bedca-2543",
+              "grams": 10
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "bulking",
+      "name": {
+        "es": "Volumen",
+        "en": "Bulking"
+      },
+      "tags": [
+        "gain"
+      ],
+      "kcal": 3000,
+      "meals": [
+        {
+          "nameKey": "meal.breakfast",
+          "items": [
+            {
+              "foodId": "bedca-1010",
+              "grams": 90
+            },
+            {
+              "foodId": "bedca-2493",
+              "grams": 300
+            },
+            {
+              "foodId": "bedca-2245",
+              "grams": 120
+            },
+            {
+              "foodId": "bedca-2185",
+              "grams": 30
+            }
+          ]
+        },
+        {
+          "nameKey": "meal.midmorning",
+          "items": [
+            {
+              "foodId": "bedca-2163",
+              "grams": 80
+            },
+            {
+              "foodId": "bedca-965",
+              "grams": 60
+            },
+            {
+              "foodId": "bedca-2543",
+              "grams": 5
+            }
+          ]
+        },
+        {
+          "nameKey": "meal.lunch",
+          "items": [
+            {
+              "foodId": "bedca-994",
+              "grams": 220
+            },
+            {
+              "foodId": "bedca-2660",
+              "grams": 100
+            },
+            {
+              "foodId": "bedca-2421",
+              "grams": 100
+            },
+            {
+              "foodId": "bedca-2543",
+              "grams": 15
+            }
+          ]
+        },
+        {
+          "nameKey": "meal.snack",
+          "items": [
+            {
+              "foodId": "bedca-1927",
+              "grams": 250
+            },
+            {
+              "foodId": "bedca-896",
+              "grams": 30
+            }
+          ]
+        },
+        {
+          "nameKey": "meal.dinner",
+          "items": [
+            {
+              "foodId": "bedca-2628",
+              "grams": 180
+            },
+            {
+              "foodId": "bedca-2404",
+              "grams": 250
+            },
+            {
+              "foodId": "bedca-2543",
+              "grams": 10
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "mediterranean",
+      "name": {
+        "es": "Mediterráneo",
+        "en": "Mediterranean"
+      },
+      "tags": [
+        "maintain"
+      ],
+      "kcal": 1600,
+      "meals": [
+        {
+          "nameKey": "meal.breakfast",
+          "items": [
+            {
+              "foodId": "bedca-2163",
+              "grams": 80
+            },
+            {
+              "foodId": "bedca-2543",
+              "grams": 10
+            },
+            {
+              "foodId": "bedca-2421",
+              "grams": 100
+            },
+            {
+              "foodId": "bedca-2517",
+              "grams": 60
+            }
+          ]
+        },
+        {
+          "nameKey": "meal.lunch",
+          "items": [
+            {
+              "foodId": "bedca-550",
+              "grams": 100
+            },
+            {
+              "foodId": "bedca-1065",
+              "grams": 70
+            },
+            {
+              "foodId": "bedca-2409",
+              "grams": 100
+            },
+            {
+              "foodId": "bedca-2543",
+              "grams": 10
+            }
+          ]
+        },
+        {
+          "nameKey": "meal.snack",
+          "items": [
+            {
+              "foodId": "bedca-1927",
+              "grams": 200
+            },
+            {
+              "foodId": "bedca-2201",
+              "grams": 20
+            }
+          ]
+        },
+        {
+          "nameKey": "meal.dinner",
+          "items": [
+            {
+              "foodId": "bedca-825",
+              "grams": 200
+            },
+            {
+              "foodId": "bedca-2404",
+              "grams": 200
+            },
+            {
+              "foodId": "bedca-2395",
+              "grams": 150
+            },
+            {
+              "foodId": "bedca-2543",
+              "grams": 10
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "light",
+      "name": {
+        "es": "Ligero",
+        "en": "Light"
+      },
+      "tags": [
+        "lose"
+      ],
+      "kcal": 1200,
+      "meals": [
+        {
+          "nameKey": "meal.breakfast",
+          "items": [
+            {
+              "foodId": "bedca-1927",
+              "grams": 200
+            },
+            {
+              "foodId": "bedca-1010",
+              "grams": 40
+            },
+            {
+              "foodId": "bedca-2225",
+              "grams": 100
+            }
+          ]
+        },
+        {
+          "nameKey": "meal.lunch",
+          "items": [
+            {
+              "foodId": "bedca-994",
+              "grams": 150
+            },
+            {
+              "foodId": "bedca-2660",
+              "grams": 50
+            },
+            {
+              "foodId": "bedca-1177",
+              "grams": 150
+            },
+            {
+              "foodId": "bedca-2543",
+              "grams": 5
+            }
+          ]
+        },
+        {
+          "nameKey": "meal.snack",
+          "items": [
+            {
+              "foodId": "bedca-2245",
+              "grams": 120
+            }
+          ]
+        },
+        {
+          "nameKey": "meal.dinner",
+          "items": [
+            {
+              "foodId": "bedca-825",
+              "grams": 180
+            },
+            {
+              "foodId": "bedca-2376",
+              "grams": 200
+            },
+            {
+              "foodId": "bedca-2421",
+              "grams": 100
+            },
+            {
+              "foodId": "bedca-2543",
+              "grams": 5
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
