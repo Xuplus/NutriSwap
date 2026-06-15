@@ -29,7 +29,7 @@
             },
             {
               "foodId": "bedca-2127",
-              "grams": 50
+              "grams": 60
             }
           ]
         },
@@ -110,7 +110,7 @@
             },
             {
               "foodId": "bedca-2127",
-              "grams": 100
+              "grams": 120
             },
             {
               "foodId": "bedca-2421",
@@ -233,7 +233,7 @@
           "items": [
             {
               "foodId": "bedca-1927",
-              "grams": 200
+              "grams": 250
             },
             {
               "foodId": "bedca-2245",
@@ -280,7 +280,7 @@
           "items": [
             {
               "foodId": "bedca-2127",
-              "grams": 150
+              "grams": 120
             },
             {
               "foodId": "bedca-2216",
@@ -501,7 +501,7 @@
           "items": [
             {
               "foodId": "bedca-1927",
-              "grams": 200
+              "grams": 250
             },
             {
               "foodId": "bedca-2201",
@@ -548,7 +548,7 @@
           "items": [
             {
               "foodId": "bedca-1927",
-              "grams": 200
+              "grams": 125
             },
             {
               "foodId": "bedca-1010",

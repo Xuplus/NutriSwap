@@ -42,6 +42,19 @@ describe('diet-presets.json', () => {
         for (const meal of p.meals) expect(validMealKeys.has(meal.nameKey)).toBe(true);
       });
 
+      it('fixed-portion foods are used in whole-unit grams', () => {
+        for (const meal of p.meals) {
+          for (const it of meal.items) {
+            const food = byId.get(it.foodId);
+            if (!food?.portion) continue;
+            expect(
+              it.grams % food.portion.grams,
+              `${p.id}: ${it.foodId} (${it.grams} g) is not a multiple of ${food.portion.grams} g`,
+            ).toBe(0);
+          }
+        }
+      });
+
       it('declared kcal line matches computed macros within 8%', () => {
         const computed = presetMacros(p, byId).kcal;
         expect(Math.abs(computed - p.kcal) / p.kcal).toBeLessThan(0.08);

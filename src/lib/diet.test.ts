@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+  canScaleToFit,
   dayOverTargets,
   dietTotals,
   emptyDiet,
@@ -10,6 +11,7 @@ import {
   resizeDiet,
   scaleDietToFit,
   snapshotFood,
+  snapToPortion,
   type DayTargets,
   type DietItem,
 } from './diet';
@@ -134,5 +136,52 @@ describe('scale-to-fit', () => {
     const diet = emptyDiet(2);
     diet.meals[0].items.push({ ...rice, grams: 50 });
     expect(scaleDietToFit(diet, targets)).toBe(diet);
+  });
+});
+
+describe('fixed-portion items', () => {
+  const egg: FoodItem = {
+    id: 'bedca-2127',
+    name: { es: 'Huevo' },
+    source: 'bedca',
+    category: 'huevos',
+    per_100g: { kcal: 150, protein: 12.5, carbs: 0, fat: 11, fiber: 0 },
+    portion: { grams: 60, unit: { es: 'huevo', en: 'egg' } },
+  };
+
+  it('snapToPortion rounds to whole units, at least one', () => {
+    const p = { grams: 60, unit: { es: 'huevo', en: 'egg' } };
+    expect(snapToPortion(50, p)).toBe(60);
+    expect(snapToPortion(100, p)).toBe(120);
+    expect(snapToPortion(1, p)).toBe(60);
+    expect(snapToPortion(0, p)).toBe(60);
+  });
+
+  it('snapshotFood snaps grams to a unit multiple and carries the portion', () => {
+    const item = snapshotFood(egg, 100);
+    expect(item.grams).toBe(120);
+    expect(item.portion).toEqual(egg.portion);
+  });
+
+  it('scale-to-fit leaves locked items at whole units and scales the rest', () => {
+    // kcal-only target; other macros are slack so kcal is the binding metric.
+    const onlyKcal: DayTargets = { kcal: 300, protein: 9999, carbs: 9999, fat: 9999 };
+    const diet = emptyDiet(2);
+    diet.meals[0].items.push(snapshotFood(egg, 60)); // 60 g = 90 kcal, locked
+    diet.meals[1].items.push({ ...rice, grams: 200 }); // 708 kcal, flexible
+    expect(canScaleToFit(diet, onlyKcal)).toBe(true);
+    const scaled = scaleDietToFit(diet, onlyKcal);
+    expect(scaled.meals[0].items[0].grams).toBe(60); // egg untouched
+    expect(scaled.meals[1].items[0].grams).toBeLessThan(200); // rice shrunk
+    expect(dietTotals(scaled).kcal).toBeLessThanOrEqual(onlyKcal.kcal * 1.07);
+  });
+
+  it('cannot scale a day whose locked items alone exceed the target', () => {
+    const tinyKcal: DayTargets = { kcal: 50, protein: 9999, carbs: 9999, fat: 9999 };
+    const diet = emptyDiet(1);
+    diet.meals[0].items.push(snapshotFood(egg, 120)); // 180 kcal of locked egg alone
+    expect(dayOverTargets(dietTotals(diet), tinyKcal)).toBe(true);
+    expect(canScaleToFit(diet, tinyKcal)).toBe(false); // nothing flexible to shrink
+    expect(scaleDietToFit(diet, tinyKcal)).toBe(diet); // no-op
   });
 });

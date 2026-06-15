@@ -1,7 +1,7 @@
 // Diet builder model: a day of meals whose items are snapshots of foods
 // (name + macros at add time), so a saved diet never breaks when the
 // underlying dataset is refreshed. Persisted to localStorage.
-import type { FoodItem, Per100g } from './foods';
+import type { FoodItem, Per100g, Portion } from './foods';
 
 export type MealNameKey =
   | 'meal.breakfast'
@@ -19,6 +19,13 @@ export interface DietItem {
   category?: string;
   per_100g: Per100g;
   grams: number;
+  /** Snapshotted from the food: when set, grams are locked to whole-unit multiples. */
+  portion?: Portion;
+}
+
+/** Snap grams to the nearest whole number of units, at least one. */
+export function snapToPortion(grams: number, portion: Portion): number {
+  return Math.max(1, Math.round(grams / portion.grams)) * portion.grams;
 }
 
 export interface Meal {
@@ -116,38 +123,54 @@ export function dayOverTargets(totals: Per100g, targets: DayTargets): boolean {
   return TRACKED.some((m) => targets[m] > 0 && totals[m] / targets[m] > OVER_RATIO);
 }
 
+/** Totals contributed by locked (fixed-portion) items, which scaling can't shrink. */
+export function fixedItemTotals(diet: Diet): Per100g {
+  return sum(diet.meals.flatMap((m) => m.items.filter((it) => it.portion).map(itemMacros)));
+}
+
 /**
- * Single factor that, applied to every portion, brings the *most* exceeded
- * metric down onto its target (so nothing stays over). Returns 1 when the day
- * is already within targets — callers can treat that as "nothing to do".
+ * Single factor that, applied to the *scalable* portions, brings the most
+ * exceeded metric down onto its target. Locked items can't shrink, so the
+ * factor only has the flexible remainder (`totals − fixed`) to work with.
+ * Returns 1 when the day is already within targets or when only locked items
+ * are over (nothing to scale) — callers treat that as "nothing to do".
  */
-export function fitScaleFactor(totals: Per100g, targets: DayTargets): number {
+export function fitScaleFactor(totals: Per100g, targets: DayTargets, fixed?: Per100g): number {
   let factor = 1;
   for (const m of TRACKED) {
-    if (targets[m] > 0 && totals[m] > targets[m]) {
-      factor = Math.min(factor, targets[m] / totals[m]);
-    }
+    if (targets[m] <= 0 || totals[m] <= targets[m]) continue;
+    const fixedM = fixed ? fixed[m] : 0;
+    const flexM = totals[m] - fixedM;
+    if (flexM <= 0) continue; // locked items alone exceed the target — can't help
+    factor = Math.min(factor, Math.max(0, (targets[m] - fixedM) / flexM));
   }
   return factor;
 }
 
 /**
- * Scale every portion proportionally so the day fits within the targets. Macro
- * ratios are preserved (it shrinks the whole day uniformly); a no-op when the
- * day isn't over. Grams round to 5 g for tidy numbers.
+ * Scale flexible portions proportionally so the day fits within the targets;
+ * fixed-portion items keep their whole-unit grams. Macro ratios of the scalable
+ * part are preserved; a no-op when the day isn't over (or only locked items
+ * are). Grams round to 5 g for tidy numbers.
  */
 export function scaleDietToFit(diet: Diet, targets: DayTargets): Diet {
-  const factor = fitScaleFactor(dietTotals(diet), targets);
+  const factor = fitScaleFactor(dietTotals(diet), targets, fixedItemTotals(diet));
   if (factor >= 1) return diet;
   return {
     meals: diet.meals.map((m) => ({
       ...m,
       items: m.items.map((it) => {
+        if (it.portion) return it; // locked: indivisible units don't scale
         const scaled = Math.round((it.grams * factor) / FIT_GRAMS_STEP) * FIT_GRAMS_STEP;
         return { ...it, grams: Math.max(FIT_GRAMS_STEP, scaled) };
       }),
     })),
   };
+}
+
+/** Whether scaling would actually change the day — drives the scale button's visibility. */
+export function canScaleToFit(diet: Diet, targets: DayTargets): boolean {
+  return fitScaleFactor(dietTotals(diet), targets, fixedItemTotals(diet)) < 1;
 }
 
 export function snapshotFood(food: FoodItem, grams = 100): DietItem {
@@ -156,7 +179,8 @@ export function snapshotFood(food: FoodItem, grams = 100): DietItem {
     name: food.name.es,
     category: food.category,
     per_100g: food.per_100g,
-    grams,
+    grams: food.portion ? snapToPortion(grams, food.portion) : grams,
+    ...(food.portion ? { portion: food.portion } : {}),
   };
 }
 

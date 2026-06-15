@@ -1,5 +1,5 @@
 {
-  "comment": "Hand-curated corrections to the BEDCA-derived dataset. 'foods' adds staples genuinely absent from BEDCA's public data; 'overrides' replaces macros of BEDCA entries whose published values are implausible (see refs). Values per 100 g from USDA FoodData Central. Keep both lists short.",
+  "comment": "Hand-curated corrections to the BEDCA-derived dataset. 'foods' adds staples genuinely absent from BEDCA's public data; 'overrides' replaces macros of BEDCA entries whose published values are implausible (see refs); 'portions' flags foods that only come in indivisible units (an egg, a yogurt tub) so the diet builder locks them to whole-unit grams. Values per 100 g from USDA FoodData Central. Keep these lists short.",
   "foods": [
     {
       "id": "suppl-chicken-breast-raw",
@@ -69,6 +69,40 @@
       "id": "bedca-1733",
       "reason": "'Piñon' sits in BEDCA's fruit group; recategorized to legumes/nuts. Macros unchanged.",
       "category": "legumbres-frutos-secos"
+    }
+  ],
+  "portions": [
+    {
+      "match": { "category": "huevos", "name": "huevo de gallina" },
+      "exclude": "clara|yema",
+      "grams": 60,
+      "unit": { "es": "huevo", "en": "egg" },
+      "reason": "Whole chicken eggs are indivisible. 60 g edible ≈ one large egg (shell excluded; BEDCA values are edible portion). Separated white/yolk are excluded — those are spoonable."
+    },
+    {
+      "match": { "category": "huevos", "name": "huevo de codorniz" },
+      "grams": 11,
+      "unit": { "es": "huevo", "en": "egg" },
+      "reason": "One quail egg ≈ 11 g edible."
+    },
+    {
+      "match": { "category": "huevos", "name": "huevo de pato" },
+      "grams": 70,
+      "unit": { "es": "huevo", "en": "egg" },
+      "reason": "One duck egg ≈ 70 g edible."
+    },
+    {
+      "match": { "category": "huevos", "name": "huevo de pavo" },
+      "grams": 75,
+      "unit": { "es": "huevo", "en": "egg" },
+      "reason": "One turkey egg ≈ 75 g edible."
+    },
+    {
+      "match": { "category": "lacteos", "name": "yogur" },
+      "exclude": "l[íi]quido|mousse",
+      "grams": 125,
+      "unit": { "es": "yogur", "en": "yogurt" },
+      "reason": "Set and Greek yogurts ship in 125 g tubs across Spanish retail. Drinkable ('líquido', actimel) and dessert ('mousse') formats vary in size and stay free-weight."
     }
   ]
 }

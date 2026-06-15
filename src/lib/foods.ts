@@ -8,6 +8,13 @@ export interface Per100g {
   fiber: number;
 }
 
+/** A food that only comes in indivisible units (an egg, a yogurt tub). */
+export interface Portion {
+  /** Mass of one unit, in grams. */
+  grams: number;
+  unit: { es: string; en: string };
+}
+
 export interface FoodItem {
   id: string;
   name: { es: string; en?: string };
@@ -19,6 +26,8 @@ export interface FoodItem {
   nutriscore?: string | null;
   popularity?: number;
   per_100g: Per100g;
+  /** Present when the food can't be split: portions lock to whole-unit grams. */
+  portion?: Portion;
 }
 
 /** Compact entry of the product search index (kept tiny: 21k+ rows). */

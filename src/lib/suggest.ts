@@ -10,7 +10,7 @@
 //  - macros that are already over target repel foods rich in them
 // Selection is deterministic (no shuffling) so chips don't churn while typing.
 import type { FoodItem } from './foods';
-import type { Diet, MealNameKey } from './diet';
+import { snapToPortion, type Diet, type MealNameKey } from './diet';
 import { macroProfile, type MacroProfile } from './equivalence';
 
 export interface MacroGap {
@@ -155,6 +155,7 @@ export function suggestFoods(
       grams = range.min;
     }
     if (grams < 10) continue;
+    if (food.portion) grams = snapToPortion(grams, food.portion); // eggs etc.: whole units only
 
     const adds = {
       kcal: Math.round((food.per_100g.kcal * grams) / 100),

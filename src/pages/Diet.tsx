@@ -3,7 +3,7 @@ import { t, type Lang, type MessageKey } from '../i18n';
 import { calculateMacros, type MacroResult } from '../lib/macros';
 import { loadForm, parseInputs } from '../lib/profile';
 import {
-  dayOverTargets,
+  canScaleToFit,
   dietTotals,
   MAX_MEALS,
   MEAL_KEYS_BY_COUNT,
@@ -12,6 +12,7 @@ import {
   resizeDiet,
   scaleDietToFit,
   snapshotFood,
+  snapToPortion,
   type DayTargets,
   type Diet as DietModel,
 } from '../lib/diet';
@@ -179,7 +180,7 @@ export function Diet({ lang }: { lang: Lang }) {
     [targets, totals],
   );
 
-  const over = dayTargets ? dayOverTargets(totals, dayTargets) : false;
+  const canScale = dayTargets ? canScaleToFit(diet, dayTargets) : false;
 
   const avg = useMemo(() => weekAverages(week), [week]);
 
@@ -488,23 +489,53 @@ export function Diet({ lang }: { lang: Lang }) {
                 <ul class="meal-items">
                   {meal.items.map((item, ii) => {
                     const kcal = Math.round((item.per_100g.kcal * item.grams) / 100);
+                    const portion = item.portion;
                     return (
                       <li class="meal-item" key={`${item.foodId}-${ii}`}>
                         <span class="meal-item-name">{item.name}</span>
                         <span class="meal-item-controls">
-                          <input
-                            type="number"
-                            inputMode="numeric"
-                            min="0"
-                            max="2000"
-                            step="10"
-                            value={item.grams}
-                            aria-label={t(lang, 'eq.portion')}
-                            onInput={(e) =>
-                              updateGrams(mi, ii, parseFloat(e.currentTarget.value) || 0)
-                            }
-                          />
-                          <span class="meal-item-unit">g</span>
+                          {portion ? (
+                            <>
+                              <input
+                                type="number"
+                                inputMode="numeric"
+                                min="1"
+                                max="50"
+                                step="1"
+                                value={Math.round(item.grams / portion.grams)}
+                                aria-label={t(lang, 'diet.units')}
+                                onInput={(e) =>
+                                  updateGrams(
+                                    mi,
+                                    ii,
+                                    snapToPortion(
+                                      (parseInt(e.currentTarget.value, 10) || 1) * portion.grams,
+                                      portion,
+                                    ),
+                                  )
+                                }
+                              />
+                              <span class="meal-item-unit">
+                                × {portion.unit[lang === 'en' ? 'en' : 'es']} · {item.grams} g
+                              </span>
+                            </>
+                          ) : (
+                            <>
+                              <input
+                                type="number"
+                                inputMode="numeric"
+                                min="0"
+                                max="2000"
+                                step="10"
+                                value={item.grams}
+                                aria-label={t(lang, 'eq.portion')}
+                                onInput={(e) =>
+                                  updateGrams(mi, ii, parseFloat(e.currentTarget.value) || 0)
+                                }
+                              />
+                              <span class="meal-item-unit">g</span>
+                            </>
+                          )}
                           <span class="meal-item-kcal">{kcal} kcal</span>
                           <button
                             type="button"
@@ -649,7 +680,7 @@ export function Diet({ lang }: { lang: Lang }) {
             current={totals.fat}
             target={targets.fatG}
           />
-          {over && (
+          {canScale && (
             <button type="button" class="button scale-fit" onClick={scaleDay}>
               {t(lang, 'diet.scale')}
             </button>

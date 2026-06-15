@@ -159,6 +159,27 @@ for (const o of supplement.overrides ?? []) {
   overridesApplied++;
 }
 
+// Fixed-portion flags: foods that only come in indivisible units (an egg, a
+// yogurt tub). Each rule matches by category + name regex (with an optional
+// exclude regex) and stamps a `portion` the diet builder uses to lock grams to
+// whole-unit multiples. Matching is accent-insensitive on the Spanish name.
+const portionRules = supplement.portions ?? [];
+for (const p of portionRules) {
+  const nameRe = p.match.name ? new RegExp(p.match.name, 'i') : null;
+  const exclRe = p.exclude ? new RegExp(p.exclude, 'i') : null;
+  let matched = 0;
+  for (const f of foods) {
+    if (p.match.id && f.id !== p.match.id) continue;
+    if (p.match.category && f.category !== p.match.category) continue;
+    const name = normalizeName(f.name.es);
+    if (nameRe && !nameRe.test(name)) continue;
+    if (exclRe && exclRe.test(name)) continue;
+    f.portion = { grams: p.grams, unit: p.unit };
+    matched++;
+  }
+  console.log(`portion [${p.match.name ?? p.match.id}: ${p.unit.es}=${p.grams}g]: ${matched} foods`);
+}
+
 foods.sort((a, b) => a.name.es.localeCompare(b.name.es, 'es'));
 
 await mkdir('public/data', { recursive: true });
