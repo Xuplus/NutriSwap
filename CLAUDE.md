@@ -63,7 +63,21 @@ Engines are pure functions, separated from UI and individually tested:
 - `src/lib/diet.ts` — diet-builder model: meals per day with named layouts, totals,
   localStorage persistence. Diet items are **snapshots** (name + macros at add time),
   so saved diets survive dataset refreshes; resizing meal count merges orphaned items
-  into the last meal instead of dropping them.
+  into the last meal instead of dropping them. Also the **scale-to-fit** helpers
+  (`dayOverTargets` / `fitScaleFactor` / `scaleDietToFit`): shrink a whole day
+  uniformly so the most-overshot macro lands on target — used by a button that
+  appears (preset or hand-built day) whenever a macro exceeds its target.
+- `src/lib/week.ts` — weekly plan model: 7 day-plans (each a `Diet` + originating
+  `presetId`), localStorage `nutriswap.week`, a one-time migration that lifts a legacy
+  single-day `nutriswap.diet` into day 0, and `weekAverages` over *planned* days only.
+- `src/lib/presets.ts` + `public/data/diet-presets.json` — hand-authored full-day
+  meal templates aimed at a general macro line. They reference BEDCA generic ids
+  (resolved against the eager core foods) and `applyPreset` turns one into a normal
+  Diet of snapshots. Grains/legumes/oats are authored as **dry/raw weights** because
+  BEDCA's cooked entries for those carry near-raw energy (a known dataset quirk); a
+  test asserts every id resolves and each declared kcal line matches its computed
+  macros within 8%. The Diet page lets the user assign presets per day, star
+  favorites, copy a day onto another, and tune any day.
 - `src/lib/suggest.ts` — gap-fit suggestions for the diet builder: scores BEDCA
   generics by how much a realistic portion reduces the kcal-weighted remaining gap
   (overshoot penalized double). Realism lives in data at the top of the file:

@@ -110,7 +110,11 @@ Tasks:
 
 - [x] ~~Daily meal builder that fills the user's macros from chosen foods.~~ Shipped as
       "Mi dieta" (`#/diet`): meals per day, per-meal food search, live progress bars
-      against the calculator's targets.
+      against the calculator's targets. Extended to a **weekly planner**: assign a
+      day-preset (`public/data/diet-presets.json`) to each of the 7 days, star
+      favorites, copy a day onto another, scale a day to fit when it overshoots, and
+      see a planned-days average. Presets drop in as-is; adaptation is manual + the
+      scale-to-fit button.
 - Barcode lookup (camera) against the OFF dataset.
 - Micronutrients (BEDCA has up to 39 values per food).
 - Price-aware equivalences — researched in depth, see "Price integration" below.

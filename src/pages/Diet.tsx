@@ -3,17 +3,35 @@ import { t, type Lang, type MessageKey } from '../i18n';
 import { calculateMacros, type MacroResult } from '../lib/macros';
 import { loadForm, parseInputs } from '../lib/profile';
 import {
+  dayOverTargets,
   dietTotals,
-  loadDiet,
   MAX_MEALS,
   MEAL_KEYS_BY_COUNT,
   mealTotals,
   MIN_MEALS,
   resizeDiet,
-  saveDiet,
+  scaleDietToFit,
   snapshotFood,
+  type DayTargets,
   type Diet as DietModel,
 } from '../lib/diet';
+import {
+  clearDay,
+  copyDay,
+  isDayEmpty,
+  loadWeek,
+  saveWeek,
+  setDay,
+  weekAverages,
+  type DayPlan,
+  type WeekPlan,
+} from '../lib/week';
+import {
+  applyPreset,
+  loadPresets,
+  presetMacros,
+  type DietPreset,
+} from '../lib/presets';
 import {
   loadCoreFoods,
   loadProductById,
@@ -25,6 +43,37 @@ import {
 import { suggestFoods, type MacroGap, type Suggestion as GapSuggestion } from '../lib/suggest';
 
 type Suggestion = { kind: 'core'; food: FoodItem } | { kind: 'product'; entry: ProductIndexEntry };
+
+/** Short weekday labels, Monday-first. */
+const DAY_KEYS: MessageKey[] = [
+  'day.mon',
+  'day.tue',
+  'day.wed',
+  'day.thu',
+  'day.fri',
+  'day.sat',
+  'day.sun',
+];
+
+const FAVORITES_KEY = 'nutriswap.presetFavorites';
+
+function loadFavorites(): Set<string> {
+  try {
+    const raw = localStorage.getItem(FAVORITES_KEY);
+    if (raw) return new Set(JSON.parse(raw) as string[]);
+  } catch {
+    /* ignore */
+  }
+  return new Set();
+}
+
+type Status = 'over' | 'good' | 'under';
+
+function bandStatus(current: number, target: number): Status {
+  if (target <= 0) return 'good';
+  const pct = (current / target) * 100;
+  return pct > 107 ? 'over' : pct >= 93 ? 'good' : 'under';
+}
 
 function ProgressBar({
   lang,
@@ -40,7 +89,7 @@ function ProgressBar({
   target: number;
 }) {
   const pct = target > 0 ? (current / target) * 100 : 0;
-  const status = pct > 107 ? 'over' : pct >= 93 ? 'good' : 'under';
+  const status = bandStatus(current, target);
   const diff = Math.round(Math.abs(target - current));
   const note =
     status === 'good'
@@ -77,22 +126,62 @@ export function Diet({ lang }: { lang: Lang }) {
     return parsed ? calculateMacros(parsed.profile, parsed.activity, parsed.goal) : null;
   }, []);
 
-  const [diet, setDiet] = useState<DietModel>(loadDiet);
+  const [week, setWeek] = useState<WeekPlan>(loadWeek);
+  const [selectedDay, setSelectedDay] = useState(0);
   const [core, setCore] = useState<FoodItem[]>([]);
+  const [presets, setPresets] = useState<DietPreset[]>([]);
+  const [favorites, setFavorites] = useState<Set<string>>(loadFavorites);
+  const [presetsOpen, setPresetsOpen] = useState(false);
   const [productIndex, setProductIndex] = useState<ProductIndexEntry[] | null>(null);
   const [includeProducts, setIncludeProducts] = useState(false);
   const [searchAt, setSearchAt] = useState<number | null>(null);
   const [query, setQuery] = useState('');
 
-  useEffect(() => saveDiet(diet), [diet]);
+  useEffect(() => saveWeek(week), [week]);
   useEffect(() => {
     loadCoreFoods().then(setCore).catch(console.error);
+    loadPresets().then(setPresets).catch(console.error);
   }, []);
   useEffect(() => {
     if (includeProducts && !productIndex) {
       loadProductsIndex().then(setProductIndex).catch(console.error);
     }
   }, [includeProducts, productIndex]);
+
+  const byId = useMemo(() => new Map(core.map((f) => [f.id, f])), [core]);
+
+  const day = week.days[selectedDay];
+  const diet = day.diet;
+  const totals = useMemo(() => dietTotals(diet), [diet]);
+
+  const dayTargets = useMemo<DayTargets | null>(
+    () =>
+      targets
+        ? {
+            kcal: targets.goalKcal,
+            protein: targets.proteinG,
+            carbs: targets.carbsG,
+            fat: targets.fatG,
+          }
+        : null,
+    [targets],
+  );
+
+  const gap = useMemo<MacroGap | null>(
+    () =>
+      targets
+        ? {
+            protein: targets.proteinG - totals.protein,
+            carbs: targets.carbsG - totals.carbs,
+            fat: targets.fatG - totals.fat,
+          }
+        : null,
+    [targets, totals],
+  );
+
+  const over = dayTargets ? dayOverTargets(totals, dayTargets) : false;
+
+  const avg = useMemo(() => weekAverages(week), [week]);
 
   const suggestions = useMemo<Suggestion[]>(() => {
     if (searchAt === null || query.trim().length < 2) return [];
@@ -116,39 +205,41 @@ export function Diet({ lang }: { lang: Lang }) {
     return [...fromCore, ...fromProducts];
   }, [searchAt, query, core, includeProducts, productIndex]);
 
-  const totals = useMemo(() => dietTotals(diet), [diet]);
-
-  const gap = useMemo<MacroGap | null>(
+  // Presets surfaced favorites-first, then by calorie line.
+  const sortedPresets = useMemo(
     () =>
-      targets
-        ? {
-            protein: targets.proteinG - totals.protein,
-            carbs: targets.carbsG - totals.carbs,
-            fat: targets.fatG - totals.fat,
-          }
-        : null,
-    [targets, totals],
+      [...presets].sort((a, b) => {
+        const fa = favorites.has(a.id) ? 0 : 1;
+        const fb = favorites.has(b.id) ? 0 : 1;
+        return fa - fb || a.kcal - b.kcal;
+      }),
+    [presets, favorites],
   );
 
-  const dayComplete = useMemo(() => {
-    if (!targets || totals.kcal === 0) return false;
-    const inBand = (current: number, target: number) =>
-      target <= 0 || (current / target >= 0.93 && current / target <= 1.07);
-    return (
-      inBand(totals.kcal, targets.goalKcal) &&
-      inBand(totals.protein, targets.proteinG) &&
-      inBand(totals.carbs, targets.carbsG) &&
-      inBand(totals.fat, targets.fatG)
-    );
-  }, [targets, totals]);
+  function selectDay(index: number) {
+    setSelectedDay(index);
+    setSearchAt(null);
+    setQuery('');
+    setPresetsOpen(false);
+  }
+
+  function updateDay(updater: (d: DietModel) => DietModel, presetId?: string | null) {
+    setWeek((w) => {
+      const d = w.days[selectedDay];
+      const next: DayPlan = {
+        diet: updater(d.diet),
+        presetId: presetId === undefined ? d.presetId : presetId,
+      };
+      return setDay(w, selectedDay, next);
+    });
+  }
 
   function addFood(mealIndex: number, food: FoodItem, grams = 100) {
-    setDiet((d) => {
-      const meals = d.meals.map((m, i) =>
+    updateDay((d) => ({
+      meals: d.meals.map((m, i) =>
         i === mealIndex ? { ...m, items: [...m.items, snapshotFood(food, grams)] } : m,
-      );
-      return { meals };
-    });
+      ),
+    }));
   }
 
   async function addSuggestion(mealIndex: number, s: Suggestion, grams = 100) {
@@ -160,8 +251,8 @@ export function Diet({ lang }: { lang: Lang }) {
   }
 
   function updateGrams(mealIndex: number, itemIndex: number, grams: number) {
-    setDiet((d) => {
-      const meals = d.meals.map((m, i) =>
+    updateDay((d) => ({
+      meals: d.meals.map((m, i) =>
         i === mealIndex
           ? {
               ...m,
@@ -170,27 +261,46 @@ export function Diet({ lang }: { lang: Lang }) {
               ),
             }
           : m,
-      );
-      return { meals };
-    });
+      ),
+    }));
   }
 
   function removeItem(mealIndex: number, itemIndex: number) {
-    setDiet((d) => {
-      const meals = d.meals.map((m, i) =>
+    updateDay((d) => ({
+      meals: d.meals.map((m, i) =>
         i === mealIndex ? { ...m, items: m.items.filter((_, j) => j !== itemIndex) } : m,
-      );
-      return { meals };
-    });
+      ),
+    }));
   }
 
-  function clearDay() {
+  function applyPresetToDay(preset: DietPreset) {
+    updateDay(() => applyPreset(preset, byId), preset.id);
+    setPresetsOpen(false);
+  }
+
+  function scaleDay() {
+    if (!dayTargets) return;
+    updateDay((d) => scaleDietToFit(d, dayTargets));
+  }
+
+  function clearSelectedDay() {
     if (window.confirm(t(lang, 'diet.clear.confirm'))) {
-      setDiet((d) => ({ meals: d.meals.map((m) => ({ ...m, items: [] })) }));
+      setWeek((w) => clearDay(w, selectedDay));
+      setSearchAt(null);
     }
   }
 
-  if (!targets) {
+  function toggleFavorite(id: string) {
+    setFavorites((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      localStorage.setItem(FAVORITES_KEY, JSON.stringify([...next]));
+      return next;
+    });
+  }
+
+  if (!targets || !dayTargets) {
     return (
       <section>
         <h1>{t(lang, 'diet.title')}</h1>
@@ -204,28 +314,47 @@ export function Diet({ lang }: { lang: Lang }) {
     );
   }
 
+  const presetName = (id: string | null) =>
+    presets.find((p) => p.id === id)?.name[lang === 'en' ? 'en' : 'es'] ?? null;
+  const showPresets = presetsOpen || isDayEmpty(day);
+
   return (
     <section>
       <h1>{t(lang, 'diet.title')}</h1>
-      <p class="intro">{t(lang, 'diet.intro')}</p>
+      <p class="intro">{t(lang, 'diet.week.intro')}</p>
+
+      <div class="week-strip" role="tablist" aria-label={t(lang, 'diet.week.tablist')}>
+        {week.days.map((d, i) => {
+          const k = Math.round(dietTotals(d.diet).kcal);
+          const empty = isDayEmpty(d);
+          const status = empty ? 'under' : bandStatus(k, targets.goalKcal);
+          const label = presetName(d.presetId) ?? t(lang, empty ? 'diet.day.unplanned' : 'diet.day.custom');
+          return (
+            <button
+              type="button"
+              role="tab"
+              aria-selected={i === selectedDay}
+              class={`week-day ${i === selectedDay ? 'active' : ''} ${empty ? 'empty' : ''}`}
+              key={i}
+              onClick={() => selectDay(i)}
+            >
+              <span class="week-day-name">{t(lang, DAY_KEYS[i])}</span>
+              {empty ? (
+                <span class="week-day-add">＋ {t(lang, 'diet.day.addPreset')}</span>
+              ) : (
+                <>
+                  <span class="week-day-preset">{label}</span>
+                  <span class="week-day-kcal">
+                    <span class={`dot ${status}`} aria-hidden="true" /> {k} kcal
+                  </span>
+                </>
+              )}
+            </button>
+          );
+        })}
+      </div>
 
       <div class="eq-options">
-        <label class="portion">
-          {t(lang, 'diet.mealsPerDay')}
-          <select
-            value={diet.meals.length}
-            onChange={(e) => setDiet((d) => resizeDiet(d, Number(e.currentTarget.value)))}
-          >
-            {Object.keys(MEAL_KEYS_BY_COUNT)
-              .map(Number)
-              .filter((n) => n >= MIN_MEALS && n <= MAX_MEALS)
-              .map((n) => (
-                <option key={n} value={n}>
-                  {n}
-                </option>
-              ))}
-          </select>
-        </label>
         <label class="check">
           <input
             type="checkbox"
@@ -234,13 +363,108 @@ export function Diet({ lang }: { lang: Lang }) {
           />
           {t(lang, 'eq.includeProducts')}
         </label>
-        <button type="button" class="link-button" onClick={clearDay}>
-          {t(lang, 'diet.clear')}
-        </button>
       </div>
 
       <div class="diet-grid">
-        <div class="diet-meals">
+        <div class="diet-day">
+          <div class="day-editor-head">
+            <h2>{t(lang, 'diet.editDay', { day: t(lang, DAY_KEYS[selectedDay]) })}</h2>
+            <div class="day-editor-actions">
+              <label class="portion">
+                {t(lang, 'diet.mealsPerDay')}
+                <select
+                  value={diet.meals.length}
+                  onChange={(e) => updateDay((d) => resizeDiet(d, Number(e.currentTarget.value)))}
+                >
+                  {Object.keys(MEAL_KEYS_BY_COUNT)
+                    .map(Number)
+                    .filter((n) => n >= MIN_MEALS && n <= MAX_MEALS)
+                    .map((n) => (
+                      <option key={n} value={n}>
+                        {n}
+                      </option>
+                    ))}
+                </select>
+              </label>
+              <label class="portion">
+                {t(lang, 'diet.copyTo')}
+                <select
+                  value=""
+                  onChange={(e) => {
+                    const to = Number(e.currentTarget.value);
+                    if (!Number.isNaN(to)) setWeek((w) => copyDay(w, selectedDay, to));
+                    e.currentTarget.value = '';
+                  }}
+                >
+                  <option value="">…</option>
+                  {week.days.map((_, i) =>
+                    i === selectedDay ? null : (
+                      <option key={i} value={i}>
+                        {t(lang, DAY_KEYS[i])}
+                      </option>
+                    ),
+                  )}
+                </select>
+              </label>
+              <button type="button" class="link-button" onClick={clearSelectedDay}>
+                {t(lang, 'diet.clear')}
+              </button>
+            </div>
+          </div>
+
+          {day.presetId && (
+            <p class="preset-label">
+              {t(lang, 'diet.presets.fromLabel', { name: presetName(day.presetId) ?? '' })}
+            </p>
+          )}
+
+          <div class="preset-bar">
+            <button
+              type="button"
+              class="button secondary"
+              aria-expanded={showPresets}
+              onClick={() => setPresetsOpen((v) => !v)}
+            >
+              {t(lang, isDayEmpty(day) ? 'diet.presets.pick' : 'diet.presets.open')}
+            </button>
+          </div>
+
+          {showPresets && (
+            <div class="preset-grid">
+              {sortedPresets.map((p) => {
+                const m = presetMacros(p, byId);
+                const fav = favorites.has(p.id);
+                return (
+                  <div class="preset-card" key={p.id}>
+                    <div class="preset-card-head">
+                      <strong>{p.name[lang === 'en' ? 'en' : 'es']}</strong>
+                      <button
+                        type="button"
+                        class={`star ${fav ? 'on' : ''}`}
+                        aria-label={t(lang, 'diet.presets.favorite')}
+                        aria-pressed={fav}
+                        onClick={() => toggleFavorite(p.id)}
+                      >
+                        {fav ? '★' : '☆'}
+                      </button>
+                    </div>
+                    <span class="preset-card-macros">
+                      {p.kcal} kcal · P {Math.round(m.protein)} · C {Math.round(m.carbs)} · G{' '}
+                      {Math.round(m.fat)}
+                    </span>
+                    <button
+                      type="button"
+                      class="button"
+                      onClick={() => applyPresetToDay(p)}
+                    >
+                      {t(lang, 'diet.presets.apply')}
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+
           {diet.meals.map((meal, mi) => {
             const mt = mealTotals(meal);
             const chips: GapSuggestion[] =
@@ -250,7 +474,7 @@ export function Diet({ lang }: { lang: Lang }) {
                 ? suggestFoods(gap, meal.nameKey, diet, core, 6)
                 : [];
             return (
-              <div class="panel meal" key={meal.nameKey}>
+              <div class="panel meal" key={`${selectedDay}-${meal.nameKey}`}>
                 <div class="meal-head">
                   <h2>{t(lang, meal.nameKey as MessageKey)}</h2>
                   <span class="meal-totals">
@@ -425,7 +649,40 @@ export function Diet({ lang }: { lang: Lang }) {
             current={totals.fat}
             target={targets.fatG}
           />
-          {dayComplete && <p class="day-complete">🎉 {t(lang, 'diet.complete')}</p>}
+          {over && (
+            <button type="button" class="button scale-fit" onClick={scaleDay}>
+              {t(lang, 'diet.scale')}
+            </button>
+          )}
+
+          <div class="week-summary">
+            <h3>{t(lang, 'diet.week.average')}</h3>
+            {avg.plannedDays === 0 ? (
+              <p class="hint">{t(lang, 'diet.week.noPlanned')}</p>
+            ) : (
+              <>
+                <p class="hint">{t(lang, 'diet.week.planned', { n: avg.plannedDays })}</p>
+                <ul class="avg-list">
+                  {(
+                    [
+                      ['results.kcal', avg.averages.kcal, targets.goalKcal, 'kcal'],
+                      ['results.protein', avg.averages.protein, targets.proteinG, 'g'],
+                      ['results.carbs', avg.averages.carbs, targets.carbsG, 'g'],
+                      ['results.fat', avg.averages.fat, targets.fatG, 'g'],
+                    ] as const
+                  ).map(([key, value, target, unit]) => (
+                    <li key={key}>
+                      <span>{t(lang, key)}</span>
+                      <span class={`avg-value ${bandStatus(value, target)}`}>
+                        {Math.round(value)} / {Math.round(target)} {unit}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </>
+            )}
+          </div>
+
           <p class="hint">
             {t(lang, 'diet.targetsNote', {
               goal: t(lang, `goal.${loadForm().goal}` as MessageKey),
