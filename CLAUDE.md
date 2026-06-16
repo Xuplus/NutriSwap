@@ -102,6 +102,14 @@ Engines are pure functions, separated from UI and individually tested:
   and its parsing into engine inputs. Shared by the Macros page (form) and the Diet
   page (targets), so both always agree; don't duplicate this parsing.
 
+The Diet page's **Print / PDF** button calls `window.print()` and renders
+`src/components/PrintableWeek.tsx` — a print-only weekly view (one bordered table
+per planned day, with fixed-portion amounts shown as units, plus a week-average
+table). It's hidden on screen and revealed by an `@media print` block in
+`style.css` (scoped with `body:has(.print-only)` so other pages still print
+normally); the browser's "Save as PDF" is the export, so there's no PDF
+dependency. Keep the print layout in that one component + the print stylesheet.
+
 UI pages (`src/pages/`) receive `lang` as a prop. Routing is **hash-based**
 (`src/router.ts`) because GitHub Pages has no SPA fallback — keep new routes as
 `#/route`. i18n is a flat dictionary in `src/i18n/index.ts`; a test enforces key parity

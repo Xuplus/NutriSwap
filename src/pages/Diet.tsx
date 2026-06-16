@@ -42,6 +42,7 @@ import {
   type ProductIndexEntry,
 } from '../lib/foods';
 import { suggestFoods, type MacroGap, type Suggestion as GapSuggestion } from '../lib/suggest';
+import { PrintableWeek } from '../components/PrintableWeek';
 
 type Suggestion = { kind: 'core'; food: FoodItem } | { kind: 'product'; entry: ProductIndexEntry };
 
@@ -183,6 +184,7 @@ export function Diet({ lang }: { lang: Lang }) {
   const canScale = dayTargets ? canScaleToFit(diet, dayTargets) : false;
 
   const avg = useMemo(() => weekAverages(week), [week]);
+  const anyPlanned = week.days.some((d) => !isDayEmpty(d));
 
   const suggestions = useMemo<Suggestion[]>(() => {
     if (searchAt === null || query.trim().length < 2) return [];
@@ -364,6 +366,11 @@ export function Diet({ lang }: { lang: Lang }) {
           />
           {t(lang, 'eq.includeProducts')}
         </label>
+        {anyPlanned && (
+          <button type="button" class="button secondary print-button" onClick={() => window.print()}>
+            🖨 {t(lang, 'diet.print')}
+          </button>
+        )}
       </div>
 
       <div class="diet-grid">
@@ -722,6 +729,10 @@ export function Diet({ lang }: { lang: Lang }) {
           </p>
         </div>
       </div>
+
+      {anyPlanned && (
+        <PrintableWeek lang={lang} week={week} targets={dayTargets} presetName={presetName} />
+      )}
     </section>
   );
 }

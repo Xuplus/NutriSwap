@@ -1161,3 +1161,98 @@ details summary {
   margin-bottom: 0.5rem;
   resize: vertical;
 }
+
+.print-button {
+  margin-left: auto;
+}
+
+/* The weekly-plan print view is rendered in the DOM but hidden on screen; the
+   print stylesheet below reveals it (and hides the app chrome) so the browser's
+   "Save as PDF" produces a clean, dependency-free document. */
+.print-only {
+  display: none;
+}
+
+@media print {
+  /* Only take over the page when a printable block exists (the diet page); other
+     pages keep printing their normal content. */
+  body:has(.print-only) .header,
+  body:has(.print-only) .footer {
+    display: none;
+  }
+  body:has(.print-only) .main {
+    padding: 0;
+  }
+  body:has(.print-only) .main > section > *:not(.print-only) {
+    display: none;
+  }
+  .print-only {
+    display: block;
+  }
+
+  @page {
+    margin: 14mm;
+  }
+
+  .print-week {
+    color: #000;
+    font-size: 11px;
+  }
+  .print-head h1 {
+    margin: 0 0 0.15rem;
+    font-size: 18px;
+  }
+  .print-sub,
+  .print-date {
+    margin: 0;
+    color: #333;
+  }
+  .print-date {
+    margin-bottom: 0.7rem;
+    font-size: 10px;
+  }
+  .print-day {
+    break-inside: avoid;
+    margin-bottom: 0.8rem;
+  }
+  .print-day h2 {
+    font-size: 13px;
+    margin: 0 0 0.25rem;
+    border-bottom: 1px solid #000;
+    padding-bottom: 2px;
+  }
+  .print-day-preset {
+    font-weight: 400;
+    color: #333;
+  }
+  .print-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  .print-table th,
+  .print-table td {
+    border: 1px solid #999;
+    padding: 2px 5px;
+    text-align: left;
+    vertical-align: top;
+  }
+  .print-table th {
+    background: #eee;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+  }
+  .print-table .num {
+    text-align: right;
+    white-space: nowrap;
+  }
+  .print-table .meal-cell {
+    font-weight: 600;
+    background: #f6f6f6;
+    white-space: nowrap;
+  }
+  .print-table tfoot td {
+    font-weight: 700;
+    border-top: 2px solid #000;
+  }
+}
