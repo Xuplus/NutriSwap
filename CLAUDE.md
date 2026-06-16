@@ -67,6 +67,14 @@ Engines are pure functions, separated from UI and individually tested:
   (`dayOverTargets` / `fitScaleFactor` / `scaleDietToFit`): shrink a whole day
   uniformly so the most-overshot macro lands on target — used by a button that
   appears (preset or hand-built day) whenever a macro exceeds its target.
+  **Fixed-portion items**: foods that only come in indivisible units (eggs,
+  yogurt tubs) carry a `portion` ({grams, unit}) snapshotted onto the diet item;
+  the UI shows a unit stepper instead of free grams, `snapToPortion` keeps grams
+  on whole-unit multiples, and scale-to-fit leaves them untouched (it scales only
+  the flexible remainder via `fixedItemTotals`, and `canScaleToFit` hides the
+  button when only locked items are over). The flags are authored in the
+  `portions` list of `data/foods-supplement.json` (category + name regex, optional
+  exclude) and stamped onto foods at build time — see `build-foods-core.mjs`.
 - `src/lib/week.ts` — weekly plan model: 7 day-plans (each a `Diet` + originating
   `presetId`), localStorage `nutriswap.week`, a one-time migration that lifts a legacy
   single-day `nutriswap.diet` into day 0, and `weekAverages` over *planned* days only.
@@ -77,7 +85,12 @@ Engines are pure functions, separated from UI and individually tested:
   BEDCA's cooked entries for those carry near-raw energy (a known dataset quirk); a
   test asserts every id resolves and each declared kcal line matches its computed
   macros within 8%. The Diet page lets the user assign presets per day, star
-  favorites, copy a day onto another, and tune any day.
+  favorites, copy a day onto another, and tune any day. Authoring is done with a
+  **dev-only editor** at `#/preset-editor` (`src/pages/PresetEditor.tsx`): build a
+  day by food name, see live totals and the kcal-line deviation, and copy the
+  resulting JSON into `diet-presets.json`. It is code-split behind
+  `import.meta.env.DEV` (dropped from production builds) and linked in the footer
+  only in dev.
 - `src/lib/suggest.ts` — gap-fit suggestions for the diet builder: scores BEDCA
   generics by how much a realistic portion reduces the kcal-weighted remaining gap
   (overshoot penalized double). Realism lives in data at the top of the file:

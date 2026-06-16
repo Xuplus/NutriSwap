@@ -1,3 +1,4 @@
+import type { ComponentType } from 'preact';
 import { useEffect, useState } from 'preact/hooks';
 import { getInitialLang, persistLang, t, type Lang, LANGS } from './i18n';
 import { parseHash, routeHref, type Route } from './router';
@@ -11,12 +12,21 @@ import { NotFound } from './pages/NotFound';
 export function App() {
   const [lang, setLang] = useState<Lang>(getInitialLang);
   const [route, setRoute] = useState<Route>(() => parseHash(location.hash));
+  // Dev-only preset editor, code-split so the `import.meta.env.DEV` guard lets
+  // Vite drop the chunk entirely from production builds.
+  const [PresetEditor, setPresetEditor] = useState<ComponentType<{ lang: Lang }> | null>(null);
 
   useEffect(() => {
     const onHashChange = () => setRoute(parseHash(location.hash));
     window.addEventListener('hashchange', onHashChange);
     return () => window.removeEventListener('hashchange', onHashChange);
   }, []);
+
+  useEffect(() => {
+    if (import.meta.env.DEV && route === 'preset-editor' && !PresetEditor) {
+      import('./pages/PresetEditor').then((m) => setPresetEditor(() => m.PresetEditor));
+    }
+  }, [route, PresetEditor]);
 
   useEffect(() => persistLang(lang), [lang]);
 
@@ -64,6 +74,8 @@ export function App() {
         {route === 'equivalence' && <Equivalence lang={lang} />}
         {route === 'diet' && <Diet lang={lang} />}
         {route === 'attribution' && <Attribution lang={lang} />}
+        {route === 'preset-editor' &&
+          (import.meta.env.DEV ? PresetEditor && <PresetEditor lang={lang} /> : <NotFound lang={lang} />)}
         {route === 'not-found' && <NotFound lang={lang} />}
       </main>
 
@@ -75,6 +87,12 @@ export function App() {
           <a href="https://github.com/Xuplus/NutriSwap" target="_blank" rel="noopener noreferrer">
             GitHub
           </a>
+          {import.meta.env.DEV && (
+            <>
+              {' · '}
+              <a href="#/preset-editor">Preset editor (dev)</a>
+            </>
+          )}
         </p>
       </footer>
     </div>

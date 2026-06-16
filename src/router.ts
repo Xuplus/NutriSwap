@@ -1,4 +1,11 @@
-export type Route = 'home' | 'macros' | 'equivalence' | 'diet' | 'attribution' | 'not-found';
+export type Route =
+  | 'home'
+  | 'macros'
+  | 'equivalence'
+  | 'diet'
+  | 'attribution'
+  | 'preset-editor'
+  | 'not-found';
 
 // Hash-based routing: GitHub Pages serves project sites from a subpath and has no
 // SPA fallback, so #/macros works everywhere without server configuration.
@@ -15,6 +22,8 @@ export function parseHash(hash: string): Route {
       return 'diet';
     case 'attribution':
       return 'attribution';
+    case 'preset-editor':
+      return 'preset-editor';
     default:
       return 'not-found';
   }

@@ -11,6 +11,7 @@ describe('parseHash', () => {
     expect(parseHash('#/equivalence')).toBe('equivalence');
     expect(parseHash('#/diet')).toBe('diet');
     expect(parseHash('#/attribution')).toBe('attribution');
+    expect(parseHash('#/preset-editor')).toBe('preset-editor');
     expect(parseHash('#/does-not-exist')).toBe('not-found');
   });
 
